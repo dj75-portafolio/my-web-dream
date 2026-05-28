@@ -14,6 +14,7 @@ import { Route as IndustrialRouteImport } from './routes/industrial'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as ComercialRouteImport } from './routes/comercial'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ResidenciaProjectRouteImport } from './routes/residencia.$project'
 
 const ResidenciaRoute = ResidenciaRouteImport.update({
   id: '/residencia',
@@ -40,20 +41,27 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResidenciaProjectRoute = ResidenciaProjectRouteImport.update({
+  id: '/$project',
+  path: '/$project',
+  getParentRoute: () => ResidenciaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
   '/industrial': typeof IndustrialRoute
-  '/residencia': typeof ResidenciaRoute
+  '/residencia': typeof ResidenciaRouteWithChildren
+  '/residencia/$project': typeof ResidenciaProjectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
   '/industrial': typeof IndustrialRoute
-  '/residencia': typeof ResidenciaRoute
+  '/residencia': typeof ResidenciaRouteWithChildren
+  '/residencia/$project': typeof ResidenciaProjectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,13 +69,26 @@ export interface FileRoutesById {
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
   '/industrial': typeof IndustrialRoute
-  '/residencia': typeof ResidenciaRoute
+  '/residencia': typeof ResidenciaRouteWithChildren
+  '/residencia/$project': typeof ResidenciaProjectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comercial' | '/contacto' | '/industrial' | '/residencia'
+  fullPaths:
+    | '/'
+    | '/comercial'
+    | '/contacto'
+    | '/industrial'
+    | '/residencia'
+    | '/residencia/$project'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comercial' | '/contacto' | '/industrial' | '/residencia'
+  to:
+    | '/'
+    | '/comercial'
+    | '/contacto'
+    | '/industrial'
+    | '/residencia'
+    | '/residencia/$project'
   id:
     | '__root__'
     | '/'
@@ -75,6 +96,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/industrial'
     | '/residencia'
+    | '/residencia/$project'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -82,7 +104,7 @@ export interface RootRouteChildren {
   ComercialRoute: typeof ComercialRoute
   ContactoRoute: typeof ContactoRoute
   IndustrialRoute: typeof IndustrialRoute
-  ResidenciaRoute: typeof ResidenciaRoute
+  ResidenciaRoute: typeof ResidenciaRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -122,16 +144,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/residencia/$project': {
+      id: '/residencia/$project'
+      path: '/$project'
+      fullPath: '/residencia/$project'
+      preLoaderRoute: typeof ResidenciaProjectRouteImport
+      parentRoute: typeof ResidenciaRoute
+    }
   }
 }
+
+interface ResidenciaRouteChildren {
+  ResidenciaProjectRoute: typeof ResidenciaProjectRoute
+}
+
+const ResidenciaRouteChildren: ResidenciaRouteChildren = {
+  ResidenciaProjectRoute: ResidenciaProjectRoute,
+}
+
+const ResidenciaRouteWithChildren = ResidenciaRoute._addFileChildren(
+  ResidenciaRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComercialRoute: ComercialRoute,
   ContactoRoute: ContactoRoute,
   IndustrialRoute: IndustrialRoute,
-  ResidenciaRoute: ResidenciaRoute,
+  ResidenciaRoute: ResidenciaRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
