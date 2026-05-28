@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResidenciaRouteImport } from './routes/residencia'
+import { Route as IndustrialRouteImport } from './routes/industrial'
+import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as ComercialRouteImport } from './routes/comercial'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ResidenciaRoute = ResidenciaRouteImport.update({
+  id: '/residencia',
+  path: '/residencia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndustrialRoute = IndustrialRouteImport.update({
+  id: '/industrial',
+  path: '/industrial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComercialRoute = ComercialRouteImport.update({
+  id: '/comercial',
+  path: '/comercial',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,78 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comercial': typeof ComercialRoute
+  '/contacto': typeof ContactoRoute
+  '/industrial': typeof IndustrialRoute
+  '/residencia': typeof ResidenciaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comercial': typeof ComercialRoute
+  '/contacto': typeof ContactoRoute
+  '/industrial': typeof IndustrialRoute
+  '/residencia': typeof ResidenciaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/comercial': typeof ComercialRoute
+  '/contacto': typeof ContactoRoute
+  '/industrial': typeof IndustrialRoute
+  '/residencia': typeof ResidenciaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/comercial' | '/contacto' | '/industrial' | '/residencia'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/comercial' | '/contacto' | '/industrial' | '/residencia'
+  id:
+    | '__root__'
+    | '/'
+    | '/comercial'
+    | '/contacto'
+    | '/industrial'
+    | '/residencia'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComercialRoute: typeof ComercialRoute
+  ContactoRoute: typeof ContactoRoute
+  IndustrialRoute: typeof IndustrialRoute
+  ResidenciaRoute: typeof ResidenciaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/residencia': {
+      id: '/residencia'
+      path: '/residencia'
+      fullPath: '/residencia'
+      preLoaderRoute: typeof ResidenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/industrial': {
+      id: '/industrial'
+      path: '/industrial'
+      fullPath: '/industrial'
+      preLoaderRoute: typeof IndustrialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comercial': {
+      id: '/comercial'
+      path: '/comercial'
+      fullPath: '/comercial'
+      preLoaderRoute: typeof ComercialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +127,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComercialRoute: ComercialRoute,
+  ContactoRoute: ContactoRoute,
+  IndustrialRoute: IndustrialRoute,
+  ResidenciaRoute: ResidenciaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
