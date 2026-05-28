@@ -3,66 +3,79 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Portafolio" },
-      { name: "description", content: "Portafolio de proyectos: residencial, comercial e industrial." },
+      { title: "Daniel Jaimes — Portafolio" },
+      { name: "description", content: "Portafolio de Daniel Jaimes: residencial, comercial e industrial." },
     ],
   }),
   component: Index,
 });
 
 const sections = [
-  { label: "Residencia", to: "/residencia" as const },
-  { label: "Comercial", to: "/comercial" as const },
-  { label: "Industrial", to: "/industrial" as const },
-  { label: "Contacto", to: "/contacto" as const },
+  { label: "RESIDENCIAL", to: "/residencia" as const },
+  { label: "COMERCIAL", to: "/comercial" as const },
+  { label: "INDUSTRIAL", to: "/industrial" as const },
 ];
 
 function Index() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white">
-      {/* Marca de agua vertical */}
+    <div className="relative min-h-screen overflow-hidden bg-[#3a3a3c] text-white">
+      {/* Lateral izquierda: DANIEL JAIMES */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+        className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center px-4 select-none"
       >
         <span
-          className="font-black tracking-[0.15em] text-white/[0.04] uppercase"
+          className="font-light uppercase text-white/25"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
-            fontSize: "clamp(8rem, 22vw, 22rem)",
-            lineHeight: 1,
+            fontSize: "clamp(2rem, 9vw, 5rem)",
+            letterSpacing: "0.35em",
+          }}
+        >
+          Daniel Jaimes
+        </span>
+      </div>
+
+      {/* Lateral derecha: PORTAFOLIO */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-center px-4 select-none"
+      >
+        <span
+          className="font-light uppercase text-white/25"
+          style={{
+            writingMode: "vertical-rl",
+            fontSize: "clamp(2rem, 9vw, 5rem)",
+            letterSpacing: "0.35em",
           }}
         >
           Portafolio
         </span>
       </div>
 
-      {/* Encabezado */}
-      <header className="relative z-10 px-8 pt-10">
-        <h1 className="text-3xl md:text-5xl font-bold tracking-[0.3em] uppercase">
-          Portafolio
-        </h1>
-        <div className="mt-3 h-px w-24 bg-white/40" />
-      </header>
-
-      {/* Botones */}
-      <main className="relative z-10 flex min-h-[calc(100vh-10rem)] items-center px-8">
-        <nav className="flex w-full max-w-md flex-col gap-5">
-          {sections.map((s) => (
-            <Link
-              key={s.to}
-              to={s.to}
-              className="group flex items-center justify-between rounded-md border border-white/15 bg-white/[0.03] px-6 py-4 text-lg font-medium uppercase tracking-[0.25em] text-white/90 backdrop-blur-sm transition-all hover:border-white/60 hover:bg-white/10 hover:tracking-[0.35em]"
-            >
-              <span>{s.label}</span>
-              <span className="text-white/40 transition-transform group-hover:translate-x-1 group-hover:text-white">
-                →
-              </span>
-            </Link>
-          ))}
-        </nav>
+      {/* Botones centrales */}
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-20 px-8 py-16">
+        {sections.map((s) => (
+          <Link
+            key={s.to}
+            to={s.to}
+            className="text-xl md:text-2xl font-light uppercase text-white/70 transition-colors hover:text-white"
+            style={{ letterSpacing: "0.4em" }}
+          >
+            {s.label}
+          </Link>
+        ))}
       </main>
+
+      {/* Contacto abajo */}
+      <Link
+        to="/contacto"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm md:text-base font-light uppercase text-white/40 transition-colors hover:text-white/80"
+        style={{ letterSpacing: "0.4em" }}
+      >
+        CONTACTO
+      </Link>
     </div>
   );
 }
