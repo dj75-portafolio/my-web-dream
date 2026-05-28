@@ -18,61 +18,80 @@ const sections = [
 
 function Index() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#3a3a3c] text-white">
-      {/* Lateral izquierda: DANIEL JAIMES */}
+    <div className="relative min-h-screen overflow-hidden bg-[#3b3b3d]">
+      {/* DANIEL JAIMES — vertical izquierda */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center px-4 select-none"
+        className="pointer-events-none absolute inset-y-0 left-0 flex items-center select-none"
+        style={{ paddingLeft: "2vw" }}
       >
         <span
-          className="font-light uppercase text-white/25"
+          className="font-light uppercase"
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
-            fontSize: "clamp(2rem, 9vw, 5rem)",
-            letterSpacing: "0.35em",
+            fontSize: "clamp(2.4rem, 11vw, 7rem)",
+            letterSpacing: "0.18em",
+            color: "#8a7d72",
+            fontFamily: "'Antonio', 'Oswald', 'Barlow Condensed', sans-serif",
+            fontStretch: "condensed",
           }}
         >
-          Daniel Jaimes
+          DANIEL JAIMES
         </span>
       </div>
 
-      {/* Lateral derecha: PORTAFOLIO */}
+      {/* PORTAFOLIO — vertical derecha */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-center px-4 select-none"
+        className="pointer-events-none absolute inset-y-0 right-0 flex items-center select-none"
+        style={{ paddingRight: "2vw" }}
       >
         <span
-          className="font-light uppercase text-white/25"
+          className="font-light uppercase"
           style={{
             writingMode: "vertical-rl",
-            fontSize: "clamp(2rem, 9vw, 5rem)",
-            letterSpacing: "0.35em",
+            fontSize: "clamp(2.4rem, 11vw, 7rem)",
+            letterSpacing: "0.18em",
+            color: "#8a7d72",
+            fontFamily: "'Antonio', 'Oswald', 'Barlow Condensed', sans-serif",
+            fontStretch: "condensed",
           }}
         >
-          Portafolio
+          PORTAFOLIO
         </span>
       </div>
 
       {/* Botones centrales */}
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-20 px-8 py-16">
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-24 md:gap-32 px-8 py-20">
         {sections.map((s) => (
           <Link
             key={s.to}
             to={s.to}
-            className="text-xl md:text-2xl font-light uppercase text-white/70 transition-colors hover:text-white"
-            style={{ letterSpacing: "0.4em" }}
+            className="font-light uppercase transition-opacity hover:opacity-100"
+            style={{
+              color: "#b8b0a8",
+              letterSpacing: "0.45em",
+              fontSize: "clamp(1.1rem, 3vw, 1.75rem)",
+              opacity: 0.85,
+            }}
           >
             {s.label}
           </Link>
         ))}
       </main>
 
-      {/* Contacto abajo */}
+      {/* CONTACTO inferior */}
       <Link
         to="/contacto"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-sm md:text-base font-light uppercase text-white/40 transition-colors hover:text-white/80"
-        style={{ letterSpacing: "0.4em" }}
+        className="absolute left-1/2 -translate-x-1/2 font-light uppercase transition-opacity hover:opacity-100"
+        style={{
+          bottom: "2.5rem",
+          color: "#9a9189",
+          letterSpacing: "0.45em",
+          fontSize: "clamp(0.85rem, 1.6vw, 1.05rem)",
+          opacity: 0.75,
+        }}
       >
         CONTACTO
       </Link>
