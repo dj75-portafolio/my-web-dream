@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import portada from "@/assets/portada.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -10,91 +11,43 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const sections = [
-  { label: "RESIDENCIAL", to: "/residencia" as const },
-  { label: "COMERCIAL", to: "/comercial" as const },
-  { label: "INDUSTRIAL", to: "/industrial" as const },
+// Zonas clicables sobre la imagen (porcentajes relativos a la imagen original).
+// La imagen mide 944x2007 aprox. Estas cajas cubren cada palabra.
+const hotspots = [
+  { to: "/residencia" as const, label: "Residencial", top: "23%", left: "22%", width: "56%", height: "5%" },
+  { to: "/comercial" as const,  label: "Comercial",  top: "47%", left: "22%", width: "56%", height: "5%" },
+  { to: "/industrial" as const, label: "Industrial", top: "71%", left: "22%", width: "56%", height: "5%" },
+  { to: "/contacto" as const,   label: "Contacto",   top: "95%", left: "30%", width: "40%", height: "4%" },
 ];
 
 function Index() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#3b3b3d]">
-      {/* DANIEL JAIMES — vertical izquierda */}
+    <div className="min-h-screen w-full bg-[#3b3b3d] flex items-center justify-center">
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 flex items-center select-none"
-        style={{ paddingLeft: "2vw" }}
+        className="relative w-full"
+        style={{ maxWidth: "min(100vw, calc(100vh * 944 / 2007))" }}
       >
-        <span
-          className="font-light uppercase"
-          style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
-            fontSize: "clamp(2.4rem, 11vw, 7rem)",
-            letterSpacing: "0.18em",
-            color: "#8a7d72",
-            fontFamily: "'Antonio', 'Oswald', 'Barlow Condensed', sans-serif",
-            fontStretch: "condensed",
-          }}
-        >
-          DANIEL JAIMES
-        </span>
-      </div>
-
-      {/* PORTAFOLIO — vertical derecha */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 flex items-center select-none"
-        style={{ paddingRight: "2vw" }}
-      >
-        <span
-          className="font-light uppercase"
-          style={{
-            writingMode: "vertical-rl",
-            fontSize: "clamp(2.4rem, 11vw, 7rem)",
-            letterSpacing: "0.18em",
-            color: "#8a7d72",
-            fontFamily: "'Antonio', 'Oswald', 'Barlow Condensed', sans-serif",
-            fontStretch: "condensed",
-          }}
-        >
-          PORTAFOLIO
-        </span>
-      </div>
-
-      {/* Botones centrales */}
-      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-24 md:gap-32 px-8 py-20">
-        {sections.map((s) => (
+        <img
+          src={portada}
+          alt="Portafolio Daniel Jaimes"
+          className="block w-full h-auto select-none"
+          draggable={false}
+        />
+        {hotspots.map((h) => (
           <Link
-            key={s.to}
-            to={s.to}
-            className="font-light uppercase transition-opacity hover:opacity-100"
+            key={h.to}
+            to={h.to}
+            aria-label={h.label}
+            className="absolute rounded-sm transition-colors hover:bg-white/5 focus:bg-white/10 focus:outline-none"
             style={{
-              color: "#b8b0a8",
-              letterSpacing: "0.45em",
-              fontSize: "clamp(1.1rem, 3vw, 1.75rem)",
-              opacity: 0.85,
+              top: h.top,
+              left: h.left,
+              width: h.width,
+              height: h.height,
             }}
-          >
-            {s.label}
-          </Link>
+          />
         ))}
-      </main>
-
-      {/* CONTACTO inferior */}
-      <Link
-        to="/contacto"
-        className="absolute left-1/2 -translate-x-1/2 font-light uppercase transition-opacity hover:opacity-100"
-        style={{
-          bottom: "2.5rem",
-          color: "#9a9189",
-          letterSpacing: "0.45em",
-          fontSize: "clamp(0.85rem, 1.6vw, 1.05rem)",
-          opacity: 0.75,
-        }}
-      >
-        CONTACTO
-      </Link>
+      </div>
     </div>
   );
 }
