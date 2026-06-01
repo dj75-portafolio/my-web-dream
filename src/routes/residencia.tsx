@@ -8,7 +8,6 @@ export const Route = createFileRoute("/residencia")({
   component: ResidenciaIndex,
 });
 
-// Ficha (primera imagen) de cada proyecto
 const projectsWithFicha = residenciaProjects
   .map((p) => {
     const imgs = getProjectImages(p.slug);
@@ -18,30 +17,45 @@ const projectsWithFicha = residenciaProjects
 
 function ResidenciaIndex() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [showHint, setShowHint] = useState(false);
+  const [showHint, setShowHint] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(true);
 
   const project = selectedIndex !== null ? projectsWithFicha[selectedIndex] : null;
   const bigScrollerRef = useRef<HTMLUListElement>(null);
 
-  // Al abrir un proyecto, mostrar el hint "girar celular" por unos segundos
+  // Detectar orientación
   useEffect(() => {
-    if (project) {
-      setShowHint(true);
-      const t = setTimeout(() => setShowHint(false), 3500);
-      return () => clearTimeout(t);
+    const update = () => setIsPortrait(window.innerHeight >= window.innerWidth);
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
+
+  // Ocultar el hint cuando el usuario gira el celular u abre un proyecto
+  useEffect(() => {
+    if (!isPortrait || project) setShowHint(false);
+  }, [isPortrait, project]);
+
+  // Auto-ocultar después de 6 segundos
+  useEffect(() => {
+    if (!showHint) return;
+    const t = setTimeout(() => setShowHint(false), 6000);
+    return () => clearTimeout(t);
+  }, [showHint]);
+
+  // Al cambiar de proyecto, reiniciar scroll a la primera imagen
+  useEffect(() => {
+    if (project && bigScrollerRef.current) {
+      bigScrollerRef.current.scrollLeft = 0;
     }
   }, [project]);
 
-  // Centrar la ficha seleccionada al abrir
-  useEffect(() => {
-    if (project && bigScrollerRef.current) {
-      const el = bigScrollerRef.current.querySelector<HTMLElement>("[data-active='true']");
-      el?.scrollIntoView({ behavior: "instant" as ScrollBehavior, inline: "center", block: "nearest" });
-    }
-  }, [project, selectedIndex]);
-
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white flex flex-col">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white flex flex-col relative">
       <header className="px-6 pt-8 pb-4 flex items-center justify-between">
         {project ? (
           <button
@@ -88,70 +102,42 @@ function ResidenciaIndex() {
             </ul>
           </div>
         ) : (
-          // ——— VISTA AMPLIADA CON FICHAS VECINAS VISIBLES ———
-          <>
-            <ul
-              ref={bigScrollerRef}
-              className="w-full flex items-center gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar py-6"
-              style={{ WebkitOverflowScrolling: "touch" }}
-            >
-              {projectsWithFicha.map((p, i) => {
-                const isActive = i === selectedIndex;
-                return (
-                  <li
-                    key={p.slug}
-                    data-active={isActive}
-                    className={`snap-center shrink-0 ${i === 0 ? "ml-[15vw]" : ""} ${
-                      i === projectsWithFicha.length - 1 ? "mr-[15vw]" : ""
-                    }`}
-                  >
-                    <Link
-                      to="/residencia/$project"
-                      params={{ project: p.slug }}
-                      className="block"
-                    >
-                      <img
-                        src={p.ficha}
-                        alt={p.name}
-                        onClick={(e) => {
-                          if (!isActive) {
-                            e.preventDefault();
-                            setSelectedIndex(i);
-                          }
-                        }}
-                        className={`block w-auto rounded-sm shadow-2xl transition-all duration-300 ${
-                          isActive
-                            ? "max-h-[75vh] ring-2 ring-white/40"
-                            : "max-h-[45vh] opacity-50 ring-1 ring-white/10"
-                        }`}
-                        draggable={false}
-                      />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Hint: girar celular */}
-            {showHint && (
-              <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center animate-fade-in">
-                <div className="flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md px-4 py-2 ring-1 ring-white/20">
-                  <RotateCw className="h-4 w-4 text-white animate-spin-slow" />
-                  <span className="text-[10px] uppercase tracking-[0.25em] text-white/90">
-                    Girar celular
-                  </span>
-                </div>
-              </div>
-            )}
-          </>
+          // ——— VISTA AMPLIADA: IMÁGENES DEL PROYECTO SELECCIONADO ———
+          <ul
+            ref={bigScrollerRef}
+            className="w-full flex items-center gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar py-6 px-[10vw]"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {project.images.map((src, i) => (
+              <li key={src} className="snap-center shrink-0">
+                <img
+                  src={src}
+                  alt={`${project.name} ${i === 0 ? "ficha" : i}`}
+                  className="block max-h-[72vh] w-auto rounded-sm shadow-2xl ring-1 ring-white/15"
+                  draggable={false}
+                />
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 
-      <p className="px-6 pb-8 text-center text-[10px] uppercase tracking-[0.3em] text-white/40">
-        {project
-          ? "Desliza ← →  ·  Toca la ficha para ver el proyecto"
-          : "Desliza ← → y toca una ficha"}
-      </p>
+      {/* Hint "Girar celular": solo en home, portrait, sobre el fondo negro de la cabecera */}
+      {!project && showHint && isPortrait && (
+        <div className="pointer-events-none absolute top-20 inset-x-0 flex justify-center animate-fade-in z-20">
+          <div className="flex items-center gap-2 rounded-full bg-black/80 px-4 py-2 ring-1 ring-white/30 shadow-xl">
+            <RotateCw className="h-4 w-4 text-white animate-spin-slow" />
+            <span className="text-[10px] uppercase tracking-[0.25em] text-white">
+              Girar celular
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="px-6 pb-8 text-center text-[10px] uppercase tracking-[0.3em] text-white/40 flex flex-col items-center gap-1">
+        <span>Desliza</span>
+        <span className="text-base tracking-[0.5em]">← →</span>
+      </div>
     </div>
   );
 }
