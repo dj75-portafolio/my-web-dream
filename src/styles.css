@@ -146,4 +146,6 @@
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .animate-spin-slow { animation: spin 2.5s linear infinite; }
 }
+
