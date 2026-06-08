@@ -17,8 +17,10 @@ const hotspots = [
   { to: "/residencia" as const, label: "Residencial", top: "23%", left: "22%", width: "56%", height: "5%" },
   { to: "/comercial" as const,  label: "Comercial",  top: "47%", left: "22%", width: "56%", height: "5%" },
   { to: "/industrial" as const, label: "Industrial", top: "71%", left: "22%", width: "56%", height: "5%" },
-  { to: "/contacto" as const,   label: "Contacto",   top: "95%", left: "30%", width: "40%", height: "4%" },
+  { to: "/contacto" as const,   label: "Contacto",   top: "95%", left: "30%", width: "40%", height: "4%", intense: true },
 ];
+
+const intenseLinkShadow = "0 0 6px rgba(0,0,0,0.95), 0 0 14px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,1)";
 
 function Index() {
   return (
