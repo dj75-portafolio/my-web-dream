@@ -79,6 +79,7 @@ function ResidenciaIndex() {
         {!project ? (
           // ——— GALERÍA DE FICHAS (thumbnails) ———
           <div
+            ref={smallScrollerRef}
             className="w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
@@ -102,7 +103,6 @@ function ResidenciaIndex() {
             </ul>
           </div>
         ) : (
-          // ——— VISTA AMPLIADA: IMÁGENES DEL PROYECTO SELECCIONADO ———
           <ul
             ref={bigScrollerRef}
             className="w-full flex items-center gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar py-6 px-[10vw]"
@@ -122,7 +122,6 @@ function ResidenciaIndex() {
         )}
       </div>
 
-      {/* Hint "Girar celular": solo en home, portrait, sobre el fondo negro de la cabecera */}
       {!project && showHint && isPortrait && (
         <div className="pointer-events-none absolute top-20 inset-x-0 flex justify-center animate-fade-in z-20">
           <div className="flex items-center gap-2 rounded-full bg-black/80 px-4 py-2 ring-1 ring-white/30 shadow-xl">
@@ -134,9 +133,26 @@ function ResidenciaIndex() {
         </div>
       )}
 
-      <div className="px-6 pb-8 text-center text-[10px] uppercase tracking-[0.3em] text-white/40 flex flex-col items-center gap-1">
-        <span>Desliza</span>
-        <span className="text-base tracking-[0.5em]">← →</span>
+      <div className="px-6 pb-8 text-center flex flex-col items-center gap-2">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/40">Desliza</span>
+        <div className="flex items-center gap-6">
+          <button
+            type="button"
+            onClick={() => scrollBy(-1)}
+            aria-label="Anterior"
+            className="text-white/80 hover:text-white text-2xl leading-none px-3 py-1 rounded-full ring-1 ring-white/20 hover:ring-white/50 transition"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollBy(1)}
+            aria-label="Siguiente"
+            className="text-white/80 hover:text-white text-2xl leading-none px-3 py-1 rounded-full ring-1 ring-white/20 hover:ring-white/50 transition"
+          >
+            →
+          </button>
+        </div>
       </div>
     </div>
   );
