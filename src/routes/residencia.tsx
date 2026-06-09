@@ -146,7 +146,7 @@ function ResidenciaIndex() {
         <div className="flex items-center gap-6">
           <button
             type="button"
-            onClick={() => scrollBy(-1)}
+            onClick={() => scrollByDir(-1)}
             aria-label="Anterior"
             className="text-white/80 hover:text-white text-2xl leading-none px-3 py-1 rounded-full ring-1 ring-white/20 hover:ring-white/50 transition"
           >
@@ -154,7 +154,7 @@ function ResidenciaIndex() {
           </button>
           <button
             type="button"
-            onClick={() => scrollBy(1)}
+            onClick={() => scrollByDir(1)}
             aria-label="Siguiente"
             className="text-white/80 hover:text-white text-2xl leading-none px-3 py-1 rounded-full ring-1 ring-white/20 hover:ring-white/50 transition"
           >
