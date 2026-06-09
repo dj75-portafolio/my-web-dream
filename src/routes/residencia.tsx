@@ -22,6 +22,14 @@ function ResidenciaIndex() {
 
   const project = selectedIndex !== null ? projectsWithFicha[selectedIndex] : null;
   const bigScrollerRef = useRef<HTMLUListElement>(null);
+  const smallScrollerRef = useRef<HTMLDivElement>(null);
+
+  const scrollByDir = (dir: -1 | 1) => {
+    const el = project ? bigScrollerRef.current : smallScrollerRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.6 * dir;
+    el.scrollBy({ left: amount, behavior: "smooth" });
+  };
 
   // Detectar orientación
   useEffect(() => {
