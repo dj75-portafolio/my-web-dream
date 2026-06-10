@@ -11,6 +11,7 @@ export const residenciaProjects: Project[] = [
   { slug: "casa-esquina", name: "CASA ESQUINA" },
   { slug: "casa-antena", name: "CASA ANTENA" },
   { slug: "casa-matallana", name: "CASA MATALLANA" },
+  { slug: "aptos-mt6", name: "APTOS MT6" },
   { slug: "casas-fachada-tipo", name: "CASAS FACHADA TIPO" },
   { slug: "apto-mosquera", name: "APTO MOSQUERA" },
   { slug: "casa-karina-reforma", name: "CASA KARINA REFORMA" },
@@ -18,7 +19,6 @@ export const residenciaProjects: Project[] = [
   { slug: "apto-panama", name: "APTO PANAMA" },
   { slug: "casa-pozos", name: "CASA POZOS" },
   { slug: "apto-santa-barbara", name: "APTO SANTA BARBARA" },
-  { slug: "aptos-mt6", name: "APTOS MT6" },
 ];
 
 // Carga ansiosa de todas las imágenes .webp dentro de las carpetas de cada proyecto.
