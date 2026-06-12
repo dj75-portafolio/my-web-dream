@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 export function CategoryPage({ title }: { title: string }) {
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white px-8 py-10">
+    <div className="min-h-screen bg-black text-white px-8 py-10">
       <Link
         to="/"
         className="text-sm uppercase tracking-[0.3em] text-white/60 hover:text-white"

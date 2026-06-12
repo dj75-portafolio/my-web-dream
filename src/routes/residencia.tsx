@@ -63,7 +63,7 @@ function ResidenciaIndex() {
   }, [project]);
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white flex flex-col relative">
+    <div className="min-h-screen bg-black text-white flex flex-col relative">
       <header className="px-6 pt-8 pb-4 flex items-center justify-between">
         {project ? (
           <button
