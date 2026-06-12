@@ -22,7 +22,7 @@ const hotspots = [
 
 function Index() {
   return (
-    <div className="min-h-screen w-full bg-[#3b3b3d] flex items-center justify-center">
+    <div className="min-h-screen w-full bg-black flex items-center justify-center">
       <div
         className="relative w-full"
         style={{ maxWidth: "min(100vw, calc(100vh * 944 / 2007))" }}
