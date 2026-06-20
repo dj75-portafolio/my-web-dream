@@ -212,6 +212,10 @@
   }
 
   @media (orientation: portrait) {
+    [data-ficha-scroller] .ficha-item-img.is-enlarged {
+      transform: scale(1.35);
+    }
+
     [data-ficha-click-hint] {
       left: 1rem;
       top: calc(50% + 18vh);

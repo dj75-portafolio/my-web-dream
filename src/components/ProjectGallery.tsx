@@ -1,11 +1,24 @@
 import { Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pointer, RotateCw } from "lucide-react";
 
 export type Project = {
   slug: string;
   name: string;
 };
+
+function portraitTitleSizeClass(name: string) {
+  if (name.length >= 26) {
+    return "text-[11px] tracking-[0.06em] leading-tight whitespace-normal";
+  }
+  if (name.length >= 22) {
+    return "text-xs tracking-[0.08em] leading-snug";
+  }
+  if (name.length >= 18) {
+    return "text-sm tracking-[0.1em] leading-snug";
+  }
+  return "text-base tracking-[0.14em] whitespace-nowrap";
+}
 
 type Props = {
   title: string;
@@ -32,9 +45,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     !project && centeredProject !== undefined && centeredProject.images.length > 1;
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const isSnappingRef = useRef(false);
-  const [portraitArrowLow, setPortraitArrowLow] = useState(false);
 
   // Precargar solo la ficha visible y las vecinas (no todas a la vez)
   useEffect(() => {
@@ -190,56 +201,47 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
 
-  const checkPortraitTitleOverlap = useCallback(() => {
-    if (!isPortrait || !project || !titleRef.current) {
-      setPortraitArrowLow(false);
-      return;
-    }
-    const titleLeft = titleRef.current.getBoundingClientRect().left;
-    setPortraitArrowLow(titleLeft < 56);
-  }, [isPortrait, project]);
+  const arrowClass =
+    "text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]";
 
-  useLayoutEffect(() => {
-    checkPortraitTitleOverlap();
-  }, [checkPortraitTitleOverlap, project?.name]);
-
-  useEffect(() => {
-    window.addEventListener("resize", checkPortraitTitleOverlap);
-    return () => window.removeEventListener("resize", checkPortraitTitleOverlap);
-  }, [checkPortraitTitleOverlap]);
-
-  const portraitBackClass = `absolute left-4 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
-    project && portraitArrowLow ? "top-[calc(50%+0.65rem)]" : "top-1/2"
-  } -translate-y-1/2`;
+  const titleText = project ? project.name : title;
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
-      <header className="px-6 pt-4 pb-2 relative flex items-center justify-center min-h-[3rem]">
-        {isPortrait &&
-          (project ? (
-            <button
-              onClick={() => setSelectedIndex(null)}
-              aria-label="Volver"
-              className={portraitBackClass}
-            >
-              {"\u2190"}
-            </button>
-          ) : (
-            <Link
-              to="/"
-              aria-label="Volver"
-              className={portraitBackClass}
-            >
-              {"\u2190"}
-            </Link>
-          ))}
-        <h1
-          ref={titleRef}
-          className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap"
-        >
-          {project ? project.name : title}
-        </h1>
-      </header>
+      {isPortrait ? (
+        <header className="relative z-50 shrink-0 bg-black grid grid-cols-[2.75rem_1fr] items-center gap-x-2 px-3 pt-4 pb-2 min-h-[3rem]">
+          <div className="flex items-center justify-center">
+            {project ? (
+              <button
+                onClick={() => setSelectedIndex(null)}
+                aria-label="Volver"
+                className={arrowClass}
+              >
+                {"\u2190"}
+              </button>
+            ) : (
+              <Link to="/" aria-label="Volver" className={arrowClass}>
+                {"\u2190"}
+              </Link>
+            )}
+          </div>
+          <h1
+            className={`min-w-0 text-center font-bold uppercase text-portafolio ${
+              project
+                ? portraitTitleSizeClass(project.name)
+                : "text-xl tracking-[0.2em] whitespace-nowrap"
+            }`}
+          >
+            {titleText}
+          </h1>
+        </header>
+      ) : (
+        <header className="relative z-50 shrink-0 bg-black px-6 pt-4 pb-2 flex items-center justify-center min-h-[3rem]">
+          <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
+            {titleText}
+          </h1>
+        </header>
+      )}
 
       {!isPortrait &&
         (project ? (
