@@ -44,7 +44,26 @@ export function getProjectImages(slug: string): string[] {
     return a.file.localeCompare(b.file);
   });
 
-  return entries.map((e) => e.url);
+  const urls = entries.map((e) => e.url);
+
+  if (slug === "casa-montoya") {
+    const byFile = new Map(entries.map((e) => [e.file, e.url]));
+    const afterFicha = [
+      "montoya-ejec-01-planta-baja-n1.webp",
+      "montoya-ejec-02-planta-n2-azotea.webp",
+      "montoya-ejec-03-cortes-long.webp",
+      "montoya-ejec-04-cortes-trans.webp",
+      "montoya-ejec-05-fachadas.webp",
+    ]
+      .map((file) => byFile.get(file))
+      .filter((url): url is string => !!url);
+    const used = new Set(afterFicha);
+    const fichaUrl = urls[0];
+    const rest = urls.filter((url) => url !== fichaUrl && !used.has(url));
+    return [fichaUrl, ...afterFicha, ...rest];
+  }
+
+  return urls;
 }
 
 export function getProject(slug: string): Project | undefined {
