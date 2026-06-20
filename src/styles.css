@@ -225,13 +225,14 @@
 
   @media (orientation: landscape) {
     [data-ficha-click-hint] {
-      left: 26%;
-      bottom: 28%;
-      top: auto;
+      left: 1rem;
+      top: 0.75rem;
+      bottom: auto;
+      align-items: flex-start;
     }
 
     [data-ficha-click-hint] .ficha-click-hint-icon {
-      transform: rotate(45deg);
+      transform: rotate(135deg);
     }
   }
 }
