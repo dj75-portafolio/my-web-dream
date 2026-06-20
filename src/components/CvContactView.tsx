@@ -64,7 +64,7 @@ export default function CvContactView({ standalone = false }: Props) {
             <BackToPortafolioLink className="absolute left-4 top-6 z-50" />
           )}
 
-          <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pb-3 pt-2">
+          <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pt-2 mb-8">
             <RotateCw className="h-7 w-7 text-portafolio animate-spin-slow" />
             <span className="text-[12px] uppercase text-portafolio">
               Girar celular
