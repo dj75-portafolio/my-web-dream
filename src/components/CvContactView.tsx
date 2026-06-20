@@ -21,6 +21,21 @@ type Props = {
   standalone?: boolean;
 };
 
+function BackToPortafolioLink({ className }: { className: string }) {
+  return (
+    <Link
+      to="/"
+      aria-label="Volver a portada"
+      className={`flex items-center gap-1.5 text-portafolio hover:text-portafolio-bright transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${className}`}
+    >
+      <span className="text-2xl leading-none">{"\u2190"}</span>
+      <span className="text-[10px] uppercase tracking-[0.2em] leading-none">
+        Portafolio
+      </span>
+    </Link>
+  );
+}
+
 export default function CvContactView({ standalone = false }: Props) {
   const [isPortrait, setIsPortrait] = useState(true);
 
@@ -52,25 +67,11 @@ export default function CvContactView({ standalone = false }: Props) {
             </span>
           </div>
           {!standalone && (
-            <Link
-              to="/"
-              aria-label="Volver a portada"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
-            >
-              {"\u2190"}
-            </Link>
+            <BackToPortafolioLink className="absolute left-4 top-1/2 -translate-y-1/2 z-50" />
           )}
         </div>
       ) : (
-        !standalone && (
-          <Link
-            to="/"
-            aria-label="Volver a portada"
-            className="fixed left-3 top-3 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
-          >
-            {"\u2190"}
-          </Link>
-        )
+        !standalone && <BackToPortafolioLink className="fixed left-3 top-3 z-50" />
       )}
 
       <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
