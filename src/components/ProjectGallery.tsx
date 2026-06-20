@@ -9,15 +9,15 @@ export type Project = {
 
 function portraitTitleSizeClass(name: string) {
   if (name.length >= 26) {
-    return "text-[11px] tracking-[0.06em] leading-tight whitespace-normal";
+    return "text-[13px] tracking-[0.07em] leading-tight whitespace-normal";
   }
   if (name.length >= 22) {
-    return "text-xs tracking-[0.08em] leading-snug";
+    return "text-sm tracking-[0.09em] leading-snug";
   }
   if (name.length >= 18) {
-    return "text-sm tracking-[0.1em] leading-snug";
+    return "text-base tracking-[0.11em] leading-snug";
   }
-  return "text-base tracking-[0.14em] whitespace-nowrap";
+  return "text-lg tracking-[0.14em] whitespace-nowrap";
 }
 
 type Props = {
