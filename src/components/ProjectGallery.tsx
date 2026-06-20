@@ -214,8 +214,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     const imgRect = img.getBoundingClientRect();
 
     setLandscapeHintPos({
-      left: imgRect.left - areaRect.left - 28,
-      top: imgRect.top - areaRect.top - 4,
+      left: imgRect.left - areaRect.left - 38,
+      top: imgRect.top - areaRect.top + 8,
     });
   }, [showClickHint, isPortrait, centeredSmall]);
 
