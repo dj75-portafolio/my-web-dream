@@ -36,7 +36,7 @@ function Index() {
         <img
           src={portada}
           alt="Portafolio Daniel Jaimes"
-          className="block w-full h-auto select-none bg-black brightness-[0.96] contrast-[1.08]"
+          className="block w-full h-auto select-none bg-black"
           draggable={false}
         />
         {hotspots.map((h) => (
@@ -53,9 +53,9 @@ function Index() {
             }}
           />
         ))}
-        {/* QR funcional superpuesto sobre el QR impreso en la imagen */}
+        {/* QR cuadrado: sin franjas blancas laterales */}
         <div
-          className="absolute z-20 flex items-center justify-center overflow-hidden bg-white"
+          className="absolute z-20 flex items-center justify-center overflow-hidden"
           style={{
             top: QR_BOX.top,
             left: QR_BOX.left,
@@ -64,13 +64,15 @@ function Index() {
           }}
           aria-label="Código QR del portafolio"
         >
-          <QRCodeSVG
-            value={PORTFOLIO_QR_URL}
-            level="M"
-            bgColor="#ffffff"
-            fgColor="#000000"
-            style={{ width: "100%", height: "100%" }}
-          />
+          <div className="relative h-full aspect-square bg-black">
+            <QRCodeSVG
+              value={PORTFOLIO_QR_URL}
+              level="M"
+              bgColor="#ffffff"
+              fgColor="#000000"
+              className="h-full w-full"
+            />
+          </div>
         </div>
       </div>
     </div>
