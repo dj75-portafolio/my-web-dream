@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pointer, RotateCw } from "lucide-react";
 
 export type Project = {
@@ -32,7 +32,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     !project && centeredProject !== undefined && centeredProject.images.length > 1;
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const isSnappingRef = useRef(false);
+  const [portraitArrowLow, setPortraitArrowLow] = useState(false);
 
   // Precargar solo la ficha visible y las vecinas (no todas a la vez)
   useEffect(() => {
@@ -188,6 +190,28 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
 
+  const checkPortraitTitleOverlap = useCallback(() => {
+    if (!isPortrait || !project || !titleRef.current) {
+      setPortraitArrowLow(false);
+      return;
+    }
+    const titleLeft = titleRef.current.getBoundingClientRect().left;
+    setPortraitArrowLow(titleLeft < 56);
+  }, [isPortrait, project]);
+
+  useLayoutEffect(() => {
+    checkPortraitTitleOverlap();
+  }, [checkPortraitTitleOverlap, project?.name]);
+
+  useEffect(() => {
+    window.addEventListener("resize", checkPortraitTitleOverlap);
+    return () => window.removeEventListener("resize", checkPortraitTitleOverlap);
+  }, [checkPortraitTitleOverlap]);
+
+  const portraitBackClass = `absolute left-4 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
+    project && portraitArrowLow ? "top-[calc(50%+0.65rem)]" : "top-1/2"
+  } -translate-y-1/2`;
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
       <header className="px-6 pt-4 pb-2 relative flex items-center justify-center min-h-[3rem]">
@@ -196,7 +220,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             <button
               onClick={() => setSelectedIndex(null)}
               aria-label="Volver"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+              className={portraitBackClass}
             >
               {"\u2190"}
             </button>
@@ -204,12 +228,15 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             <Link
               to="/"
               aria-label="Volver"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+              className={portraitBackClass}
             >
               {"\u2190"}
             </Link>
           ))}
-        <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
+        <h1
+          ref={titleRef}
+          className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap"
+        >
           {project ? project.name : title}
         </h1>
       </header>
