@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResidenciaRouteImport } from './routes/residencia'
 import { Route as IndustrialRouteImport } from './routes/industrial'
+import { Route as CvDjRouteImport } from './routes/cv-dj'
+import { Route as CvRouteImport } from './routes/cv'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as ComercialRouteImport } from './routes/comercial'
 import { Route as IndexRouteImport } from './routes/index'
@@ -24,6 +26,16 @@ const ResidenciaRoute = ResidenciaRouteImport.update({
 const IndustrialRoute = IndustrialRouteImport.update({
   id: '/industrial',
   path: '/industrial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CvDjRoute = CvDjRouteImport.update({
+  id: '/cv-dj',
+  path: '/cv-dj',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CvRoute = CvRouteImport.update({
+  id: '/cv',
+  path: '/cv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactoRoute = ContactoRouteImport.update({
@@ -51,6 +63,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
+  '/cv': typeof CvRoute
+  '/cv-dj': typeof CvDjRoute
   '/industrial': typeof IndustrialRoute
   '/residencia': typeof ResidenciaRouteWithChildren
   '/residencia/$project': typeof ResidenciaProjectRoute
@@ -59,6 +73,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
+  '/cv': typeof CvRoute
+  '/cv-dj': typeof CvDjRoute
   '/industrial': typeof IndustrialRoute
   '/residencia': typeof ResidenciaRouteWithChildren
   '/residencia/$project': typeof ResidenciaProjectRoute
@@ -68,6 +84,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/comercial': typeof ComercialRoute
   '/contacto': typeof ContactoRoute
+  '/cv': typeof CvRoute
+  '/cv-dj': typeof CvDjRoute
   '/industrial': typeof IndustrialRoute
   '/residencia': typeof ResidenciaRouteWithChildren
   '/residencia/$project': typeof ResidenciaProjectRoute
@@ -78,6 +96,8 @@ export interface FileRouteTypes {
     | '/'
     | '/comercial'
     | '/contacto'
+    | '/cv'
+    | '/cv-dj'
     | '/industrial'
     | '/residencia'
     | '/residencia/$project'
@@ -86,6 +106,8 @@ export interface FileRouteTypes {
     | '/'
     | '/comercial'
     | '/contacto'
+    | '/cv'
+    | '/cv-dj'
     | '/industrial'
     | '/residencia'
     | '/residencia/$project'
@@ -94,6 +116,8 @@ export interface FileRouteTypes {
     | '/'
     | '/comercial'
     | '/contacto'
+    | '/cv'
+    | '/cv-dj'
     | '/industrial'
     | '/residencia'
     | '/residencia/$project'
@@ -103,6 +127,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComercialRoute: typeof ComercialRoute
   ContactoRoute: typeof ContactoRoute
+  CvRoute: typeof CvRoute
+  CvDjRoute: typeof CvDjRoute
   IndustrialRoute: typeof IndustrialRoute
   ResidenciaRoute: typeof ResidenciaRouteWithChildren
 }
@@ -121,6 +147,20 @@ declare module '@tanstack/react-router' {
       path: '/industrial'
       fullPath: '/industrial'
       preLoaderRoute: typeof IndustrialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cv-dj': {
+      id: '/cv-dj'
+      path: '/cv-dj'
+      fullPath: '/cv-dj'
+      preLoaderRoute: typeof CvDjRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cv': {
+      id: '/cv'
+      path: '/cv'
+      fullPath: '/cv'
+      preLoaderRoute: typeof CvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacto': {
@@ -170,6 +210,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComercialRoute: ComercialRoute,
   ContactoRoute: ContactoRoute,
+  CvRoute: CvRoute,
+  CvDjRoute: CvDjRoute,
   IndustrialRoute: IndustrialRoute,
   ResidenciaRoute: ResidenciaRouteWithChildren,
 }
