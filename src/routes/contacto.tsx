@@ -84,14 +84,14 @@ function ContactoPage() {
             href="https://wa.me/8145942524"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/50 hover:text-white/90 transition-colors"
+            className="text-portafolio hover:text-portafolio-bright transition-colors"
             aria-label="WhatsApp"
           >
             <WhatsAppIcon className="w-10 h-10" />
           </a>
           <a
             href="mailto:dajaimes75@gmail.com"
-            className="text-white/50 hover:text-white/90 transition-colors"
+            className="text-portafolio hover:text-portafolio-bright transition-colors"
             aria-label="Correo electrónico"
           >
             <Mail className="w-10 h-10" />
