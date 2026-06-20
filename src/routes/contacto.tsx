@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import cvAsset from "@/assets/cv_contacto_v2.png.asset.json";
+
+const CV_PDF_URL = `${import.meta.env.BASE_URL}contacto/cv-arq-dj75-simplificado-2026.pdf`;
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -36,8 +37,7 @@ function ContactoPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[#0d0d0f] flex flex-col relative">
-      {/* Flecha volver — arriba, casi al borde izquierdo */}
+    <div className="min-h-screen w-full bg-black flex flex-col relative">
       <Link
         to="/"
         className="absolute left-2 top-4 z-10 text-sm text-white/40 hover:text-white/80 transition-colors"
@@ -46,14 +46,12 @@ function ContactoPage() {
         ←
       </Link>
 
-      {/* Título */}
       <div className="pt-5 pb-2 px-4 text-center">
         <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-white/85">
           CONTACTO
         </h1>
       </div>
 
-      {/* Aviso de girar celular: debajo de CONTACTO y antes del PDF */}
       {isPortrait && (
         <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in z-20 pb-4">
           <RotateCw className="h-7 w-7 text-white animate-spin-slow" />
@@ -63,21 +61,22 @@ function ContactoPage() {
         </div>
       )}
 
-      {/* Imagen CV — más ancho en horizontal */}
-      <div className="flex items-start justify-center px-2 sm:px-4">
-        <img
-          src={cvAsset.url}
-          alt="CV Daniel Jaimes"
-          className={`h-auto select-none w-full ${isPortrait ? "max-w-[420px]" : "max-w-none"}`}
-          draggable={false}
-        />
-      </div>
+      <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
+        <div
+          className={`w-full bg-white overflow-hidden ${
+            isPortrait ? "max-w-[420px]" : "max-w-none"
+          }`}
+        >
+          <iframe
+            src={`${CV_PDF_URL}#view=FitH&toolbar=0&navpanes=0`}
+            title="CV Daniel Jaimes"
+            className={`block w-full border-0 ${
+              isPortrait ? "h-[52vh] min-h-[320px]" : "h-[calc(100dvh-180px)] min-h-[420px]"
+            }`}
+          />
+        </div>
 
-
-      {/* Espacio inferior con iconos */}
-      <div className="flex-1 flex items-center justify-center relative px-4 pb-8 pt-6">
-        {/* Iconos centrados y grandes */}
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-10 pt-6">
           <a
             href="https://wa.me/8145942524"
             target="_blank"
