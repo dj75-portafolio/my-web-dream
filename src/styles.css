@@ -206,7 +206,7 @@
   @media (orientation: portrait) {
     [data-ficha-click-hint] {
       left: 1rem;
-      top: calc(50% + 30vh);
+      top: calc(50% + 18vh);
       bottom: auto;
     }
   }
