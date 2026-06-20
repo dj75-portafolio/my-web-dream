@@ -6,10 +6,32 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const repoBase = "/my-web-dream";
+const isGitHubPages = process.env.GITHUB_PAGES === "true";
+const isLovableSandbox =
+  process.env.LOVABLE_SANDBOX === "1" || !!process.env.DEV_SERVER__PROJECT_PATH;
+
 export default defineConfig({
+  // In Lovable, leave nitro unset so the sandbox uses its default Cloudflare build.
+  nitro: isLovableSandbox
+    ? undefined
+    : isGitHubPages
+      ? false
+      : { preset: "vercel" },
+  vite: {
+    base: isGitHubPages ? `${repoBase}/` : "/",
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    ...(isGitHubPages
+      ? {
+          prerender: {
+            enabled: true,
+            crawlLinks: true,
+          },
+        }
+      : {}),
   },
 });
