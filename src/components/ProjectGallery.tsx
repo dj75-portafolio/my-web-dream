@@ -112,10 +112,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   ) => {
     const idx = getNearestIndex(container);
     setIdx(idx);
-    isSnappingRef.current = true;
-    scrollItemToCenter(container, idx, smooth);
+    const target = getSnapScrollLeft(container, idx);
+    const drift = Math.abs(container.scrollLeft - target);
 
-    const finish = () => {
+    const applyEnlarge = () => {
       if (isPortraitRef.current) {
         waitForScrollSettle(container, idx, () => {
           setEnlargedIndex(idx);
@@ -128,7 +128,22 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       }
     };
 
-    window.setTimeout(finish, smooth ? 480 : 0);
+    if (isPortraitRef.current && drift <= 24) {
+      applyEnlarge();
+      return;
+    }
+
+    isSnappingRef.current = true;
+    scrollItemToCenter(container, idx, smooth);
+
+    if (isPortraitRef.current) {
+      applyEnlarge();
+    } else {
+      setEnlargedIndex(idx);
+      window.setTimeout(() => {
+        isSnappingRef.current = false;
+      }, smooth ? 450 : 0);
+    }
   };
 
   const scrollByDir = (dir: -1 | 1) => {
@@ -177,10 +192,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       if (isPortraitRef.current) {
         setIsCarouselScrolling(true);
         setEnlargedIndex(-1);
+        trackCenter(el, setCenteredSmall);
         clearTimeout(snapTimer);
         snapTimer = setTimeout(() => {
           if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-        }, 280);
+        }, 320);
         return;
       }
       trackCenter(el, setCenteredSmall);
@@ -318,7 +334,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
-          className={`w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${project ? "hidden" : ""}`}
+          className={`w-full overflow-x-auto scroll-smooth no-scrollbar ${project ? "hidden" : ""} ${
+            isPortrait ? "snap-x snap-proximity" : "snap-x snap-mandatory"
+          }`}
           style={{
             WebkitOverflowScrolling: "touch",
             scrollPaddingInline: isPortrait ? "0px" : "50vw",
