@@ -16,18 +16,26 @@ const imageModules = import.meta.glob(
 
 const customOrder: Record<string, string[]> = {
   "cocina-industrial-panama": [
-    "ficha.jpg",
-    "img-05.jpg",
-    "img-09.jpg",
-    "img-01.jpg",
-    "img-02.jpg",
-    "img-03.jpg",
-    "img-04.jpg",
-    "img-06.jpg",
-    "img-07.jpg",
-    "img-08.jpg",
+    "ficha",
+    "img-05",
+    "img-09",
+    "img-01",
+    "img-02",
+    "img-03",
+    "img-04",
+    "img-06",
+    "img-07",
+    "img-08",
   ],
 };
+
+function resolveImageStem(urlByFile: Map<string, string>, stem: string): string | undefined {
+  const key = stem.toLowerCase().replace(/\.[^.]+$/, "");
+  for (const [file, url] of urlByFile) {
+    if (file.replace(/\.[^.]+$/, "") === key) return url;
+  }
+  return undefined;
+}
 
 export function getProjectImages(slug: string): string[] {
   const entries = Object.entries(imageModules)
@@ -37,10 +45,10 @@ export function getProjectImages(slug: string): string[] {
       url,
     }));
 
+  const urlByFile = new Map(entries.map((e) => [e.file, e.url]));
   const order = customOrder[slug];
   if (order) {
-    const urlByFile = new Map(entries.map((e) => [e.file, e.url]));
-    return order.map((file) => urlByFile.get(file)).filter(Boolean) as string[];
+    return order.map((stem) => resolveImageStem(urlByFile, stem)).filter(Boolean) as string[];
   }
 
   entries.sort((a, b) => {

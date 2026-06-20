@@ -279,11 +279,21 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     return () => clearTimeout(t);
   }, [showHint]);
 
-  // Al entrar a un proyecto, reiniciar scroll libre desde la primera imagen
+  // Al entrar a un proyecto, centrar la primera imagen y precargar el resto
   useEffect(() => {
-    if (project && bigScrollerRef.current) {
-      bigScrollerRef.current.scrollLeft = 0;
-    }
+    if (!project) return;
+    project.images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+    const el = bigScrollerRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      const first = el.querySelector<HTMLElement>("[data-project-slide]");
+      if (first) {
+        el.scrollLeft = first.offsetLeft + first.offsetWidth / 2 - el.clientWidth / 2;
+      }
+    });
   }, [project]);
 
   // Al volver al carrusel de proyectos, centrar el proyecto recién visitado
@@ -383,7 +393,13 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                   className={`ficha-item shrink-0 flex justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
                 >
                   <button
-                    onClick={() => setSelectedIndex(i)}
+                    onClick={() => {
+                      p.images.forEach((src) => {
+                        const img = new Image();
+                        img.src = src;
+                      });
+                      setSelectedIndex(i);
+                    }}
                     className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
@@ -412,18 +428,25 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             className="w-full overflow-x-auto no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <ul className="flex items-center gap-6 py-6 px-[10vw]" style={{ minHeight: "85vh" }}>
+            <ul
+              className={`flex items-center gap-6 py-6 ${isPortrait ? "px-4 justify-start" : "px-[10vw]"}`}
+              style={{ minHeight: "85vh", width: "max-content" }}
+            >
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} className="shrink-0">
+                  <li key={src} data-project-slide className="shrink-0 flex items-center justify-center">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
-                      loading={i < 2 ? "eager" : "lazy"}
-                      decoding="async"
+                      loading={i < 3 ? "eager" : "lazy"}
+                      decoding={i === 0 ? "sync" : "async"}
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`block h-[70vh] w-auto rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
+                      className={`rounded-sm shadow-2xl ring-1 ring-white/15 object-contain ${
+                        isPortrait
+                          ? "max-h-[68vh] max-w-[92vw] w-auto h-auto"
+                          : "block h-[70vh] w-auto"
+                      } ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
                     />
                   </li>

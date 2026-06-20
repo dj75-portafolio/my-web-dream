@@ -7,7 +7,7 @@ import { join, extname, basename } from "node:path";
 import sharp from "sharp";
 
 const root = process.argv[2] ?? "src/assets";
-const MIN_KB = 400;
+const MIN_KB = Number(process.argv[3] ?? 400);
 const WEBP_QUALITY = 82;
 
 async function walk(dir) {
