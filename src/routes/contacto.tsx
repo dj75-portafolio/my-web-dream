@@ -39,8 +39,8 @@ function ContactoPage() {
     <div className="min-h-screen w-full bg-black flex flex-col relative">
       <Link
         to="/"
-        className="absolute left-2 top-4 z-10 text-sm text-portafolio hover:text-portafolio-bright transition-colors"
         aria-label="Volver a portada"
+        className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
       >
         ←
       </Link>
