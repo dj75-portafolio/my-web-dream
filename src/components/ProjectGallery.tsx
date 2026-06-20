@@ -18,8 +18,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const [showHint, setShowHint] = useState(true);
   const [isPortrait, setIsPortrait] = useState(true);
   const [centeredSmall, setCenteredSmall] = useState(0);
-  const [enlargedIndex, setEnlargedIndex] = useState(0);
-  const [isCarouselScrolling, setIsCarouselScrolling] = useState(false);
 
   const projectsWithFicha = projects
     .map((p) => {
@@ -32,13 +30,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
-  const isPortraitRef = useRef(isPortrait);
 
-  useEffect(() => {
-    isPortraitRef.current = isPortrait;
-  }, [isPortrait]);
-
-  // Precargar todas las fichas del carrusel al entrar
+  // Precargar fichas al entrar
   useEffect(() => {
     if (project) return;
     projectsWithFicha.forEach(({ ficha }) => {
@@ -48,53 +41,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, projectsWithFicha.length]);
 
-  const getSnapScrollLeft = (container: HTMLElement, index: number) => {
-    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
-    const target = items[index];
-    if (!target) return 0;
-    return isPortraitRef.current
-      ? target.offsetLeft
-      : target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
-  };
-
-  const isScrollAtSnap = (container: HTMLElement, index: number) =>
-    Math.abs(container.scrollLeft - getSnapScrollLeft(container, index)) < 6;
-
-  const waitForScrollSettle = (container: HTMLElement, index: number, onDone: () => void) => {
-    let frames = 0;
-    const tick = () => {
-      frames += 1;
-      if (isScrollAtSnap(container, index) || frames > 40) {
-        onDone();
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  };
-
   const getNearestIndex = (container: HTMLElement) => {
-    const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
-    if (items.length === 0) return 0;
-
-    if (isPortraitRef.current) {
-      const scroll = container.scrollLeft;
-      const viewW = container.clientWidth;
-      let bestIdx = 0;
-      let bestVisible = -1;
-      items.forEach((el, i) => {
-        const left = el.offsetLeft;
-        const right = left + el.offsetWidth;
-        const visible = Math.max(0, Math.min(right, scroll + viewW) - Math.max(left, scroll));
-        if (visible > bestVisible) {
-          bestVisible = visible;
-          bestIdx = i;
-        }
-      });
-      return bestIdx;
-    }
-
     const center = container.scrollLeft + container.clientWidth / 2;
+    const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
     let bestIdx = 0;
     let bestDist = Infinity;
     items.forEach((el, i) => {
@@ -109,10 +58,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   };
 
   const scrollItemToCenter = (container: HTMLElement, index: number, smooth = true) => {
-    container.scrollTo({
-      left: getSnapScrollLeft(container, index),
-      behavior: smooth ? "smooth" : "auto",
-    });
+    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
+    const target = items[index];
+    if (!target) return;
+    const left = target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
+    container.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
   };
 
   const snapToNearestCenter = (
@@ -122,38 +72,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   ) => {
     const idx = getNearestIndex(container);
     setIdx(idx);
-    const target = getSnapScrollLeft(container, idx);
-    const drift = Math.abs(container.scrollLeft - target);
-
-    const applyEnlarge = () => {
-      if (isPortraitRef.current) {
-        waitForScrollSettle(container, idx, () => {
-          setEnlargedIndex(idx);
-          isSnappingRef.current = false;
-          setIsCarouselScrolling(false);
-        });
-      } else {
-        setEnlargedIndex(idx);
-        isSnappingRef.current = false;
-      }
-    };
-
-    if (isPortraitRef.current && drift <= 24) {
-      applyEnlarge();
-      return;
-    }
-
     isSnappingRef.current = true;
     scrollItemToCenter(container, idx, smooth);
-
-    if (isPortraitRef.current) {
-      applyEnlarge();
-    } else {
-      setEnlargedIndex(idx);
-      window.setTimeout(() => {
-        isSnappingRef.current = false;
-      }, smooth ? 450 : 0);
-    }
+    window.setTimeout(() => {
+      isSnappingRef.current = false;
+    }, smooth ? 450 : 0);
   };
 
   const scrollByDir = (dir: -1 | 1) => {
@@ -161,21 +84,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     if (!el) return;
 
     if (!project) {
-      const activeIdx = isPortrait
-        ? enlargedIndex >= 0
-          ? enlargedIndex
-          : centeredSmall
-        : centeredSmall;
       const next = Math.max(
         0,
-        Math.min(el.querySelectorAll("[data-snap-item]").length - 1, activeIdx + dir),
+        Math.min(el.querySelectorAll("[data-snap-item]").length - 1, centeredSmall + dir),
       );
-      if (isPortrait) {
-        setIsCarouselScrolling(true);
-        setEnlargedIndex(-1);
-      } else {
-        setCenteredSmall(next);
-      }
+      setCenteredSmall(next);
       scrollItemToCenter(el, next);
       return;
     }
@@ -184,7 +97,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     el.scrollBy({ left: amount, behavior: "smooth" });
   };
 
-  // Detectar item más cercano al centro mientras se hace scroll (efecto imán)
   const trackCenter = (container: HTMLElement | null, setIdx: (i: number) => void) => {
     if (!container) return;
     setIdx(getNearestIndex(container));
@@ -199,16 +111,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
     const onScroll = () => {
       if (isSnappingRef.current) return;
-      if (isPortraitRef.current) {
-        setIsCarouselScrolling(true);
-        setEnlargedIndex(-1);
-        trackCenter(el, setCenteredSmall);
-        clearTimeout(snapTimer);
-        snapTimer = setTimeout(() => {
-          if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-        }, 320);
-        return;
-      }
       trackCenter(el, setCenteredSmall);
       clearTimeout(snapTimer);
       snapTimer = setTimeout(() => {
@@ -218,13 +120,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
     const onScrollEnd = () => {
       clearTimeout(snapTimer);
-      if (isSnappingRef.current) return;
-      snapToNearestCenter(el, setCenteredSmall);
+      if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
     };
 
     const idx = getNearestIndex(el);
     setCenteredSmall(idx);
-    setEnlargedIndex(idx);
     el.addEventListener("scroll", onScroll, { passive: true });
     el.addEventListener("scrollend", onScrollEnd);
     return () => {
@@ -232,9 +132,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       el.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(snapTimer);
     };
-  }, [project, isPortrait, projectsWithFicha.length]);
+  }, [project, projectsWithFicha.length]);
 
-  // Al cambiar orientación, anclar la ficha activa al centro (solo carrusel principal)
   useEffect(() => {
     if (project) return;
     const el = smallScrollerRef.current;
@@ -244,7 +143,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     });
   }, [isPortrait, project]);
 
-  // Detectar orientación (portrait = celular vertical)
   useEffect(() => {
     const mq = window.matchMedia("(orientation: portrait)");
     const update = () => setIsPortrait(mq.matches);
@@ -257,36 +155,29 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     };
   }, []);
 
-  // Ocultar el hint cuando el usuario gira el celular u abre un proyecto
   useEffect(() => {
     if (!isPortrait || project) setShowHint(false);
   }, [isPortrait, project]);
 
-  // Auto-ocultar después de 6 segundos
   useEffect(() => {
     if (!showHint) return;
     const t = setTimeout(() => setShowHint(false), 6000);
     return () => clearTimeout(t);
   }, [showHint]);
 
-  // Al entrar a un proyecto, reiniciar scroll desde la primera imagen
   useEffect(() => {
     if (project && bigScrollerRef.current) {
       bigScrollerRef.current.scrollLeft = 0;
     }
   }, [project]);
 
-  // Al volver al carrusel de proyectos, centrar el proyecto recién visitado
-  // useLayoutEffect evita el "flash" en el que se ve primero la primera ficha
   useLayoutEffect(() => {
     if (!project && smallScrollerRef.current) {
       const el = smallScrollerRef.current;
       const items = el.querySelectorAll<HTMLElement>("[data-snap-item]");
       const target = items[centeredSmall];
       if (target) {
-        el.scrollLeft = isPortraitRef.current
-          ? target.offsetLeft
-          : target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
+        el.scrollLeft = target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -294,7 +185,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
-      {/* HEADER: título centrado */}
       <header className="px-6 pt-4 pb-2 relative flex items-center justify-center min-h-[3rem]">
         {isPortrait &&
           (project ? (
@@ -319,7 +209,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         </h1>
       </header>
 
-      {/* Flecha volver en horizontal */}
       {!isPortrait &&
         (project ? (
           <button
@@ -340,35 +229,20 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         ))}
 
       <div className="flex-1 flex items-center relative">
-        {/* GALERÍA DE FICHAS: siempre montada para conservar el scroll */}
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
-          className={`w-full overflow-x-auto scroll-smooth no-scrollbar ${project ? "hidden" : ""} ${
-            isPortrait ? "snap-x snap-proximity" : "snap-x snap-mandatory"
-          }`}
-          style={{
-            WebkitOverflowScrolling: "touch",
-            scrollPaddingInline: isPortrait ? "0px" : "50vw",
-          }}
+          className={`w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${project ? "hidden" : ""}`}
+          style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: "50vw" }}
         >
           <ul
-            className={`ficha-track flex py-8 ${isPortrait ? "gap-0 items-center" : "items-end gap-24 pl-[50vw] pr-[50vw]"}`}
-            style={{ minHeight: isPortrait ? undefined : "70vh", width: "max-content" }}
+            className="ficha-track flex items-end gap-24 py-8 pl-[50vw] pr-[50vw]"
+            style={{ minHeight: "70vh", width: "max-content" }}
           >
             {projectsWithFicha.map((p, i) => {
-              const portraitLocked =
-                isPortrait && !isCarouselScrolling && enlargedIndex >= 0;
-              const isCenter = isPortrait
-                ? portraitLocked && i === enlargedIndex
-                : i === centeredSmall;
-              const hideNeighbor = portraitLocked && i !== enlargedIndex;
+              const isCenter = i === centeredSmall;
               return (
-                <li
-                  key={p.slug}
-                  data-snap-item
-                  className={`ficha-item shrink-0 flex justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
-                >
+                <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
                   <button
                     onClick={() => setSelectedIndex(i)}
                     className="ficha-item-btn block group"
@@ -380,9 +254,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                       loading="eager"
                       decoding="async"
                       fetchPriority="high"
-                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
-                        isPortrait ? "origin-center" : "origin-bottom"
-                      } ${isCenter ? "is-enlarged" : "is-side"}`}
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
+                        isCenter ? "is-enlarged" : "is-side"
+                      }`}
                       draggable={false}
                     />
                   </button>
@@ -402,7 +276,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} data-project-slide className="shrink-0">
+                  <li key={src} className="shrink-0">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
@@ -420,8 +294,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         )}
       </div>
 
-
-      {/* HINT: girar celular */}
       {!project && showHint && isPortrait && (
         <div
           className="pointer-events-none absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-fade-in z-20"
@@ -434,7 +306,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         </div>
       )}
 
-      {/* FOOTER: flechas sin marco */}
       <div className="px-6 pb-12 pt-2 text-center flex justify-center">
         <div className="flex items-center gap-6">
           <button
