@@ -73,7 +73,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     const el = project ? bigScrollerRef.current : smallScrollerRef.current;
     if (!el) return;
 
-    if (!project && !isPortrait) {
+    if (!project) {
       const next = Math.max(
         0,
         Math.min(el.querySelectorAll("[data-snap-item]").length - 1, centeredSmall + dir),
@@ -104,16 +104,14 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       if (isSnappingRef.current) return;
       trackCenter(el, setCenteredSmall);
 
-      if (!isPortrait) {
-        clearTimeout(snapTimer);
-        snapTimer = setTimeout(() => {
-          if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-        }, 100);
-      }
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
+      }, 100);
     };
 
     const onScrollEnd = () => {
-      if (!isPortrait && !isSnappingRef.current) {
+      if (!isSnappingRef.current) {
         snapToNearestCenter(el, setCenteredSmall);
       }
     };
@@ -128,9 +126,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     };
   }, [project, isPortrait, projectsWithFicha.length]);
 
-  // Al girar a horizontal, anclar la ficha activa al centro (solo carrusel principal)
+  // Al cambiar orientación, anclar la ficha activa al centro (solo carrusel principal)
   useEffect(() => {
-    if (isPortrait || project) return;
+    if (project) return;
     const el = smallScrollerRef.current;
     if (!el) return;
     window.requestAnimationFrame(() => {
@@ -220,7 +218,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         >
           <ul className="flex items-end gap-24 pl-[50vw] pr-[50vw] py-8" style={{ minHeight: "70vh", width: "max-content" }}>
             {projectsWithFicha.map((p, i) => {
-              const isCenter = !isPortrait && i === centeredSmall;
+              const isCenter = i === centeredSmall;
               return (
                 <li key={p.slug} data-snap-item className="snap-center shrink-0">
                   <button
