@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { RotateCw } from "lucide-react";
+import { Pointer, RotateCw } from "lucide-react";
 
 export type Project = {
   slug: string;
@@ -27,6 +27,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     .filter((p) => !!p.ficha);
 
   const project = selectedIndex !== null ? projectsWithFicha[selectedIndex] : null;
+  const centeredProject = projectsWithFicha[centeredSmall];
+  const showClickHint =
+    !project && centeredProject !== undefined && centeredProject.images.length > 1;
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
@@ -266,6 +269,19 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             })}
           </ul>
         </div>
+
+        {showClickHint && (
+          <div
+            className="pointer-events-none absolute left-4 z-30 flex flex-col items-center gap-0.5 animate-fade-in"
+            style={{ bottom: "0.75rem" }}
+            aria-hidden="true"
+          >
+            <Pointer className="h-5 w-5 text-portafolio -rotate-12 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+            <span className="text-[9px] uppercase tracking-[0.2em] text-portafolio leading-none">
+              click
+            </span>
+          </div>
+        )}
 
         {project && (
           <div
