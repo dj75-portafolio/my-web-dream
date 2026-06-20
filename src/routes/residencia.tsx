@@ -7,7 +7,7 @@ export const Route = createFileRoute("/residencia")({
   component: () => (
     <ProjectGallery
       title="Residencial"
-      projects={residenciaProjects}
+      projects={[...residenciaProjects].reverse()}
       getProjectImages={getProjectImages}
     />
   ),
