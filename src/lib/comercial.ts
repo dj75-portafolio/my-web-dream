@@ -35,7 +35,15 @@ export function getProjectImages(slug: string): string[] {
     return a.file.localeCompare(b.file);
   });
 
-  return entries.map((e) => e.url);
+  const urls = entries.map((e) => e.url);
+
+  if (slug === "glamping-la-prosperidad") {
+    // Mover img 5–8 (img-04…07) justo después de la ficha
+    if (urls.length <= 5) return urls;
+    return [urls[0], ...urls.slice(4, 8), ...urls.slice(1, 4), ...urls.slice(8)];
+  }
+
+  return urls;
 }
 
 export function getProject(slug: string): Project | undefined {
