@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CategoryPage } from "@/components/CategoryPage";
+import ProjectGallery from "@/components/ProjectGallery";
+import { comercialProjects, getProjectImages } from "@/lib/comercial";
 
 export const Route = createFileRoute("/comercial")({
   head: () => ({ meta: [{ title: "Comercial — Portafolio" }] }),
-  component: () => <CategoryPage title="Comercial" />,
+  component: () => (
+    <ProjectGallery
+      title="Comercial"
+      projects={comercialProjects}
+      getProjectImages={getProjectImages}
+    />
+  ),
 });
