@@ -18,7 +18,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const [showHint, setShowHint] = useState(true);
   const [isPortrait, setIsPortrait] = useState(true);
   const [centeredSmall, setCenteredSmall] = useState(0);
-  const [centeredBig, setCenteredBig] = useState(0);
 
   const projectsWithFicha = projects
     .map((p) => {
@@ -74,12 +73,12 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     const el = project ? bigScrollerRef.current : smallScrollerRef.current;
     if (!el) return;
 
-    if (!isPortrait) {
-      const current = project ? centeredBig : centeredSmall;
-      const count = el.querySelectorAll("[data-snap-item]").length;
-      const next = Math.max(0, Math.min(count - 1, current + dir));
-      if (project) setCenteredBig(next);
-      else setCenteredSmall(next);
+    if (!project && !isPortrait) {
+      const next = Math.max(
+        0,
+        Math.min(el.querySelectorAll("[data-snap-item]").length - 1, centeredSmall + dir),
+      );
+      setCenteredSmall(next);
       scrollItemToCenter(el, next);
       return;
     }
@@ -95,27 +94,27 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   };
 
   useEffect(() => {
-    const el = project ? bigScrollerRef.current : smallScrollerRef.current;
+    if (project) return;
+    const el = smallScrollerRef.current;
     if (!el) return;
 
-    const setter = project ? setCenteredBig : setCenteredSmall;
     let snapTimer: ReturnType<typeof setTimeout> | undefined;
 
     const onScroll = () => {
       if (isSnappingRef.current) return;
-      trackCenter(el, setter);
+      trackCenter(el, setCenteredSmall);
 
       if (!isPortrait) {
         clearTimeout(snapTimer);
         snapTimer = setTimeout(() => {
-          if (!isSnappingRef.current) snapToNearestCenter(el, setter);
+          if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
         }, 100);
       }
     };
 
     const onScrollEnd = () => {
       if (!isPortrait && !isSnappingRef.current) {
-        snapToNearestCenter(el, setter);
+        snapToNearestCenter(el, setCenteredSmall);
       }
     };
 
@@ -129,13 +128,13 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     };
   }, [project, isPortrait, projectsWithFicha.length]);
 
-  // Al girar a horizontal, anclar la ficha/imagen activa al centro
+  // Al girar a horizontal, anclar la ficha activa al centro (solo carrusel principal)
   useEffect(() => {
-    if (isPortrait) return;
-    const el = project ? bigScrollerRef.current : smallScrollerRef.current;
+    if (isPortrait || project) return;
+    const el = smallScrollerRef.current;
     if (!el) return;
     window.requestAnimationFrame(() => {
-      snapToNearestCenter(el, project ? setCenteredBig : setCenteredSmall, false);
+      snapToNearestCenter(el, setCenteredSmall, false);
     });
   }, [isPortrait, project]);
 
@@ -163,20 +162,12 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     return () => clearTimeout(t);
   }, [showHint]);
 
-  // Al cambiar de proyecto, centrar la ficha en horizontal
+  // Al entrar a un proyecto, reiniciar scroll libre desde la primera imagen
   useEffect(() => {
     if (project && bigScrollerRef.current) {
       bigScrollerRef.current.scrollLeft = 0;
-      setCenteredBig(0);
-      if (!isPortrait) {
-        window.requestAnimationFrame(() => {
-          if (bigScrollerRef.current) {
-            snapToNearestCenter(bigScrollerRef.current, setCenteredBig, false);
-          }
-        });
-      }
     }
-  }, [project, isPortrait]);
+  }, [project]);
 
   // Al volver al carrusel de proyectos, centrar el proyecto recién visitado
   // useLayoutEffect evita el "flash" en el que se ve primero la primera ficha
@@ -253,17 +244,14 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         {project && (
           <div
             ref={bigScrollerRef}
-            className={`w-full overflow-x-auto no-scrollbar ${!isPortrait ? "snap-x snap-mandatory scroll-smooth" : ""}`}
-            style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: !isPortrait ? "50vw" : undefined }}
+            className="w-full overflow-x-auto no-scrollbar"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <ul
-              className={`flex items-center gap-6 py-6 ${!isPortrait ? "pl-[50vw] pr-[50vw]" : "px-[10vw]"}`}
-              style={{ minHeight: "85vh", width: !isPortrait ? "max-content" : undefined }}
-            >
+            <ul className="flex items-center gap-6 py-6 px-[10vw]" style={{ minHeight: "85vh" }}>
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} data-snap-item className={`shrink-0 ${!isPortrait ? "snap-center" : ""}`}>
+                  <li key={src} className="shrink-0">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
