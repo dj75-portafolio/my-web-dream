@@ -198,6 +198,14 @@
     opacity: 1;
   }
 
+  /* Galería proyecto: más grande que ficha centrada del carrusel (~63vh) */
+  [data-project-scroller] .project-gallery-img {
+    display: block;
+    height: min(85vh, 720px);
+    width: auto;
+    max-width: none;
+  }
+
   /* Indicador click en ficha centrada */
   [data-ficha-click-hint] .ficha-click-hint-icon {
     transform: rotate(-12deg);

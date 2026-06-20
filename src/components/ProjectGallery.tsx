@@ -286,10 +286,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         {project && (
           <div
             ref={bigScrollerRef}
+            data-project-scroller
             className="w-full overflow-x-auto no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <ul className="flex items-center gap-6 py-6 px-[10vw]" style={{ minHeight: "85vh" }}>
+            <ul className="flex items-center gap-6 py-6 px-[6vw]" style={{ minHeight: "90vh" }}>
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
@@ -300,11 +301,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                       loading={i < 2 ? "eager" : "lazy"}
                       decoding="async"
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`block rounded-sm shadow-2xl ring-1 ring-white/15 ${
-                        isPortrait
-                          ? "max-h-[70vh] max-w-[92vw] w-auto h-auto object-contain"
-                          : "h-[78vh] w-auto"
-                      } ${isFicha ? "cursor-pointer" : ""}`}
+                      className={`project-gallery-img block rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
                     />
                   </li>
