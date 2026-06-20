@@ -195,7 +195,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               aria-label="Volver"
               className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
             >
-              ?
+              {"\u2190"}
             </button>
           ) : (
             <Link
@@ -203,7 +203,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               aria-label="Volver"
               className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
             >
-              ?
+              {"\u2190"}
             </Link>
           ))}
         <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
@@ -218,7 +218,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Volver"
             className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
           >
-            ?
+            {"\u2190"}
           </button>
         ) : (
           <Link
@@ -226,7 +226,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Volver"
             className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
           >
-            ?
+            {"\u2190"}
           </Link>
         ))}
 
@@ -315,7 +315,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Anterior"
             className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
-            ?
+            {"\u2190"}
           </button>
           <button
             type="button"
@@ -323,7 +323,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Siguiente"
             className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
-            ?
+            {"\u2192"}
           </button>
         </div>
       </div>
