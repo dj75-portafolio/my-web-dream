@@ -325,8 +325,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
           }}
         >
           <ul
-            className={`ficha-track flex items-end py-8 ${isPortrait ? "gap-0" : "gap-24 pl-[50vw] pr-[50vw]"}`}
-            style={{ minHeight: "70vh", width: "max-content" }}
+            className={`ficha-track flex py-8 ${isPortrait ? "gap-0 items-center" : "items-end gap-24 pl-[50vw] pr-[50vw]"}`}
+            style={{ minHeight: isPortrait ? undefined : "70vh", width: "max-content" }}
           >
             {projectsWithFicha.map((p, i) => {
               const portraitLocked =
@@ -339,7 +339,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                 <li
                   key={p.slug}
                   data-snap-item
-                  className={`ficha-item shrink-0 flex items-end justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
+                  className={`ficha-item shrink-0 flex justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
                 >
                   <button
                     onClick={() => setSelectedIndex(i)}
@@ -349,9 +349,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                     <img
                       src={p.ficha}
                       alt={p.name}
-                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
-                        isCenter ? "is-enlarged" : "is-side"
-                      }`}
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
+                        isPortrait ? "origin-center" : "origin-bottom"
+                      } ${isCenter ? "is-enlarged" : "is-side"}`}
                       draggable={false}
                     />
                   </button>
