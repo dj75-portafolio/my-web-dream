@@ -40,8 +40,16 @@ for (const file of await walk(root)) {
     .toBuffer();
 
   const { unlink, writeFile } = await import("node:fs/promises");
+  const tmp = `${file}.tmp`;
+  await writeFile(tmp, buffer);
   if (out !== file) await unlink(file).catch(() => {});
-  await writeFile(out, buffer);
+  try {
+    await writeFile(out, buffer);
+  } catch {
+    const { rename } = await import("node:fs/promises");
+    await rename(tmp, out);
+  }
+  await unlink(tmp).catch(() => {});
   const after = buffer.length;
 
   console.log(

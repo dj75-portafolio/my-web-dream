@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RotateCw } from "lucide-react";
 
 export type Project = {
@@ -30,6 +30,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
+  const isPortraitRef = useRef(isPortrait);
+
+  useEffect(() => {
+    isPortraitRef.current = isPortrait;
+  }, [isPortrait]);
 
   // Precargar fichas al entrar
   useEffect(() => {
@@ -41,9 +46,37 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, projectsWithFicha.length]);
 
+  const getSnapScrollLeft = (container: HTMLElement, index: number) => {
+    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
+    const target = items[index];
+    if (!target) return 0;
+    return isPortraitRef.current
+      ? target.offsetLeft
+      : target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
+  };
+
   const getNearestIndex = (container: HTMLElement) => {
-    const center = container.scrollLeft + container.clientWidth / 2;
     const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
+    if (items.length === 0) return 0;
+
+    if (isPortraitRef.current) {
+      const scroll = container.scrollLeft;
+      const viewW = container.clientWidth;
+      let bestIdx = 0;
+      let bestVisible = -1;
+      items.forEach((el, i) => {
+        const left = el.offsetLeft;
+        const right = left + el.offsetWidth;
+        const visible = Math.max(0, Math.min(right, scroll + viewW) - Math.max(left, scroll));
+        if (visible > bestVisible) {
+          bestVisible = visible;
+          bestIdx = i;
+        }
+      });
+      return bestIdx;
+    }
+
+    const center = container.scrollLeft + container.clientWidth / 2;
     let bestIdx = 0;
     let bestDist = Infinity;
     items.forEach((el, i) => {
@@ -58,11 +91,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   };
 
   const scrollItemToCenter = (container: HTMLElement, index: number, smooth = true) => {
-    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
-    const target = items[index];
-    if (!target) return;
-    const left = target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
-    container.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+    container.scrollTo({
+      left: getSnapScrollLeft(container, index),
+      behavior: smooth ? "smooth" : "auto",
+    });
   };
 
   const snapToNearestCenter = (
@@ -74,10 +106,22 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     setIdx(idx);
     isSnappingRef.current = true;
     scrollItemToCenter(container, idx, smooth);
-    window.setTimeout(() => {
-      isSnappingRef.current = false;
-    }, smooth ? 450 : 0);
+    window.setTimeout(
+      () => {
+        isSnappingRef.current = false;
+      },
+      smooth ? (isPortraitRef.current ? 320 : 450) : 0,
+    );
   };
+
+  const recenterCarousel = useCallback(() => {
+    const el = smallScrollerRef.current;
+    if (!el || project) return;
+    window.requestAnimationFrame(() => {
+      snapToNearestCenter(el, setCenteredSmall, false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project]);
 
   const scrollByDir = (dir: -1 | 1) => {
     const el = project ? bigScrollerRef.current : smallScrollerRef.current;
@@ -115,7 +159,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       clearTimeout(snapTimer);
       snapTimer = setTimeout(() => {
         if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-      }, 150);
+      }, isPortraitRef.current ? 220 : 150);
     };
 
     const onScrollEnd = () => {
@@ -132,7 +176,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       el.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(snapTimer);
     };
-  }, [project, projectsWithFicha.length]);
+  }, [project, isPortrait, projectsWithFicha.length]);
 
   useEffect(() => {
     if (project) return;
@@ -174,11 +218,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   useLayoutEffect(() => {
     if (!project && smallScrollerRef.current) {
       const el = smallScrollerRef.current;
-      const items = el.querySelectorAll<HTMLElement>("[data-snap-item]");
-      const target = items[centeredSmall];
-      if (target) {
-        el.scrollLeft = target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
-      }
+      el.scrollLeft = getSnapScrollLeft(el, centeredSmall);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
@@ -232,17 +272,28 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
-          className={`w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${project ? "hidden" : ""}`}
-          style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: "50vw" }}
+          className={`w-full overflow-x-auto scroll-smooth no-scrollbar ${project ? "hidden" : ""} ${
+            isPortrait ? "snap-x snap-mandatory" : "snap-x snap-mandatory"
+          }`}
+          style={{
+            WebkitOverflowScrolling: "touch",
+            scrollPaddingInline: isPortrait ? "0px" : "50vw",
+          }}
         >
           <ul
-            className="ficha-track flex items-end gap-24 py-8 pl-[50vw] pr-[50vw]"
-            style={{ minHeight: "70vh", width: "max-content" }}
+            className={`ficha-track flex py-8 ${
+              isPortrait ? "gap-0 items-center" : "items-end gap-24 pl-[50vw] pr-[50vw]"
+            }`}
+            style={{ minHeight: isPortrait ? undefined : "70vh", width: "max-content" }}
           >
             {projectsWithFicha.map((p, i) => {
               const isCenter = i === centeredSmall;
               return (
-                <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
+                <li
+                  key={p.slug}
+                  data-snap-item
+                  className={`ficha-item shrink-0 ${isPortrait ? "snap-start" : "snap-center"}`}
+                >
                   <button
                     onClick={() => setSelectedIndex(i)}
                     className="ficha-item-btn block group"
@@ -254,9 +305,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                       loading="eager"
                       decoding="async"
                       fetchPriority="high"
-                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
-                        isCenter ? "is-enlarged" : "is-side"
-                      }`}
+                      onLoad={recenterCarousel}
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
+                        isPortrait ? "origin-center" : "origin-bottom"
+                      } ${isCenter ? "is-enlarged" : "is-side"}`}
                       draggable={false}
                     />
                   </button>
@@ -276,14 +328,18 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} className="shrink-0">
+                  <li key={src} className="shrink-0 flex justify-center">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
                       loading={i < 2 ? "eager" : "lazy"}
                       decoding="async"
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`block h-[70vh] w-auto rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
+                      className={`block rounded-sm shadow-2xl ring-1 ring-white/15 ${
+                        isPortrait
+                          ? "max-h-[70vh] max-w-[92vw] w-auto h-auto object-contain"
+                          : "h-[70vh] w-auto"
+                      } ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
                     />
                   </li>
