@@ -1,10 +1,18 @@
 /**
- * Convierte JPG/PNG pesados a WebP y elimina el original si ahorra espacio.
- * Uso: node scripts/optimize-images.mjs [carpeta]
+ * Convierte JPG/PNG pesados a WebP (solo desarrollo local).
+ * Requiere: npm install sharp --no-save
+ * Uso: node scripts/optimize-images.mjs src/assets [minKB]
  */
 import { readdir, stat, unlink } from "node:fs/promises";
 import { join, extname, basename } from "node:path";
-import sharp from "sharp";
+
+let sharp;
+try {
+  sharp = (await import("sharp")).default;
+} catch {
+  console.error("Instala sharp localmente: npm install sharp --no-save");
+  process.exit(1);
+}
 
 const root = process.argv[2] ?? "src/assets";
 const MIN_KB = Number(process.argv[3] ?? 400);

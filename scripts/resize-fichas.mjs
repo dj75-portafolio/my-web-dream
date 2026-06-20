@@ -1,10 +1,17 @@
 /**
- * Redimensiona fichas muy grandes (Industrial) para carga rápida en móvil.
- * Uso: node scripts/resize-fichas.mjs src/assets/industrial
+ * Redimensiona fichas muy grandes (solo desarrollo local).
+ * Requiere: npm install sharp --no-save
  */
 import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
-import sharp from "sharp";
+
+let sharp;
+try {
+  sharp = (await import("sharp")).default;
+} catch {
+  console.error("Instala sharp localmente: npm install sharp --no-save");
+  process.exit(1);
+}
 
 const root = process.argv[2] ?? "src/assets/industrial";
 const MAX_WIDTH = 2400;
