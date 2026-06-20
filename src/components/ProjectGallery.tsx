@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RotateCw } from "lucide-react";
 
 export type Project = {
@@ -30,53 +30,22 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
-  const isPortraitRef = useRef(isPortrait);
 
-  useEffect(() => {
-    isPortraitRef.current = isPortrait;
-  }, [isPortrait]);
-
-  // Precargar fichas al entrar
+  // Precargar solo la ficha visible y las vecinas (no todas a la vez)
   useEffect(() => {
     if (project) return;
-    projectsWithFicha.forEach(({ ficha }) => {
-      const img = new Image();
-      img.src = ficha;
-    });
+    [centeredSmall - 1, centeredSmall, centeredSmall + 1]
+      .filter((i) => i >= 0 && i < projectsWithFicha.length)
+      .forEach((i) => {
+        const img = new Image();
+        img.src = projectsWithFicha[i].ficha;
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, projectsWithFicha.length]);
-
-  const getSnapScrollLeft = (container: HTMLElement, index: number) => {
-    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
-    const target = items[index];
-    if (!target) return 0;
-    return isPortraitRef.current
-      ? target.offsetLeft
-      : target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
-  };
+  }, [project, centeredSmall, projectsWithFicha.length]);
 
   const getNearestIndex = (container: HTMLElement) => {
-    const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
-    if (items.length === 0) return 0;
-
-    if (isPortraitRef.current) {
-      const scroll = container.scrollLeft;
-      const viewW = container.clientWidth;
-      let bestIdx = 0;
-      let bestVisible = -1;
-      items.forEach((el, i) => {
-        const left = el.offsetLeft;
-        const right = left + el.offsetWidth;
-        const visible = Math.max(0, Math.min(right, scroll + viewW) - Math.max(left, scroll));
-        if (visible > bestVisible) {
-          bestVisible = visible;
-          bestIdx = i;
-        }
-      });
-      return bestIdx;
-    }
-
     const center = container.scrollLeft + container.clientWidth / 2;
+    const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
     let bestIdx = 0;
     let bestDist = Infinity;
     items.forEach((el, i) => {
@@ -91,10 +60,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   };
 
   const scrollItemToCenter = (container: HTMLElement, index: number, smooth = true) => {
-    container.scrollTo({
-      left: getSnapScrollLeft(container, index),
-      behavior: smooth ? "smooth" : "auto",
-    });
+    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
+    const target = items[index];
+    if (!target) return;
+    const left = target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
+    container.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
   };
 
   const snapToNearestCenter = (
@@ -106,22 +76,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     setIdx(idx);
     isSnappingRef.current = true;
     scrollItemToCenter(container, idx, smooth);
-    window.setTimeout(
-      () => {
-        isSnappingRef.current = false;
-      },
-      smooth ? (isPortraitRef.current ? 320 : 450) : 0,
-    );
+    window.setTimeout(() => {
+      isSnappingRef.current = false;
+    }, smooth ? 450 : 0);
   };
-
-  const recenterCarousel = useCallback(() => {
-    const el = smallScrollerRef.current;
-    if (!el || project) return;
-    window.requestAnimationFrame(() => {
-      snapToNearestCenter(el, setCenteredSmall, false);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project]);
 
   const scrollByDir = (dir: -1 | 1) => {
     const el = project ? bigScrollerRef.current : smallScrollerRef.current;
@@ -159,7 +117,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       clearTimeout(snapTimer);
       snapTimer = setTimeout(() => {
         if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-      }, isPortraitRef.current ? 220 : 150);
+      }, 150);
     };
 
     const onScrollEnd = () => {
@@ -176,7 +134,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       el.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(snapTimer);
     };
-  }, [project, isPortrait, projectsWithFicha.length]);
+  }, [project, projectsWithFicha.length]);
 
   useEffect(() => {
     if (project) return;
@@ -218,7 +176,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   useLayoutEffect(() => {
     if (!project && smallScrollerRef.current) {
       const el = smallScrollerRef.current;
-      el.scrollLeft = getSnapScrollLeft(el, centeredSmall);
+      const items = el.querySelectorAll<HTMLElement>("[data-snap-item]");
+      const target = items[centeredSmall];
+      if (target) {
+        el.scrollLeft = target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project]);
@@ -233,7 +195,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               aria-label="Volver"
               className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
             >
-              ←
+              ?
             </button>
           ) : (
             <Link
@@ -241,7 +203,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               aria-label="Volver"
               className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
             >
-              ←
+              ?
             </Link>
           ))}
         <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
@@ -256,7 +218,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Volver"
             className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
           >
-            ←
+            ?
           </button>
         ) : (
           <Link
@@ -264,7 +226,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Volver"
             className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
           >
-            ←
+            ?
           </Link>
         ))}
 
@@ -272,28 +234,17 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
-          className={`w-full overflow-x-auto scroll-smooth no-scrollbar ${project ? "hidden" : ""} ${
-            isPortrait ? "snap-x snap-mandatory" : "snap-x snap-mandatory"
-          }`}
-          style={{
-            WebkitOverflowScrolling: "touch",
-            scrollPaddingInline: isPortrait ? "0px" : "50vw",
-          }}
+          className={`w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${project ? "hidden" : ""}`}
+          style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: "50vw" }}
         >
           <ul
-            className={`ficha-track flex py-8 ${
-              isPortrait ? "gap-0 items-center" : "items-end gap-24 pl-[50vw] pr-[50vw]"
-            }`}
-            style={{ minHeight: isPortrait ? undefined : "70vh", width: "max-content" }}
+            className="ficha-track flex items-end gap-24 py-8 pl-[50vw] pr-[50vw]"
+            style={{ minHeight: "70vh", width: "max-content" }}
           >
             {projectsWithFicha.map((p, i) => {
               const isCenter = i === centeredSmall;
               return (
-                <li
-                  key={p.slug}
-                  data-snap-item
-                  className={`ficha-item shrink-0 ${isPortrait ? "snap-start" : "snap-center"}`}
-                >
+                <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
                   <button
                     onClick={() => setSelectedIndex(i)}
                     className="ficha-item-btn block group"
@@ -302,13 +253,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                     <img
                       src={p.ficha}
                       alt={p.name}
-                      loading="eager"
+                      loading={isCenter ? "eager" : "lazy"}
                       decoding="async"
-                      fetchPriority="high"
-                      onLoad={recenterCarousel}
-                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
-                        isPortrait ? "origin-center" : "origin-bottom"
-                      } ${isCenter ? "is-enlarged" : "is-side"}`}
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
+                        isCenter ? "is-enlarged" : "is-side"
+                      }`}
                       draggable={false}
                     />
                   </button>
@@ -328,18 +277,14 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} className="shrink-0 flex justify-center">
+                  <li key={src} className="shrink-0">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
                       loading={i < 2 ? "eager" : "lazy"}
                       decoding="async"
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`block rounded-sm shadow-2xl ring-1 ring-white/15 ${
-                        isPortrait
-                          ? "max-h-[70vh] max-w-[92vw] w-auto h-auto object-contain"
-                          : "h-[70vh] w-auto"
-                      } ${isFicha ? "cursor-pointer" : ""}`}
+                      className={`block max-h-[70vh] max-w-[92vw] w-auto h-auto object-contain rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
                     />
                   </li>
@@ -370,7 +315,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Anterior"
             className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
-            ←
+            ?
           </button>
           <button
             type="button"
@@ -378,7 +323,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             aria-label="Siguiente"
             className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
-            →
+            ?
           </button>
         </div>
       </div>
