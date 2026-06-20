@@ -20,7 +20,6 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const [centeredSmall, setCenteredSmall] = useState(0);
   const [enlargedIndex, setEnlargedIndex] = useState(0);
   const [isCarouselScrolling, setIsCarouselScrolling] = useState(false);
-  const [fichasReady, setFichasReady] = useState<Record<string, boolean>>({});
 
   const projectsWithFicha = projects
     .map((p) => {
@@ -39,21 +38,12 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     isPortraitRef.current = isPortrait;
   }, [isPortrait]);
 
-  const markFichaReady = (src: string) => {
-    setFichasReady((prev) => (prev[src] ? prev : { ...prev, [src]: true }));
-  };
-
-  // Precargar fichas del carrusel y las primeras imágenes de cada proyecto
+  // Precargar todas las fichas del carrusel al entrar
   useEffect(() => {
     if (project) return;
-    projectsWithFicha.forEach(({ ficha, images }) => {
-      [ficha, ...images.slice(1, 4)].forEach((src) => {
-        if (fichasReady[src]) return;
-        const img = new Image();
-        img.onload = () => markFichaReady(src);
-        img.onerror = () => markFichaReady(src);
-        img.src = src;
-      });
+    projectsWithFicha.forEach(({ ficha }) => {
+      const img = new Image();
+      img.src = ficha;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project, projectsWithFicha.length]);
@@ -279,21 +269,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     return () => clearTimeout(t);
   }, [showHint]);
 
-  // Al entrar a un proyecto, centrar la primera imagen y precargar el resto
+  // Al entrar a un proyecto, reiniciar scroll desde la primera imagen
   useEffect(() => {
-    if (!project) return;
-    project.images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-    const el = bigScrollerRef.current;
-    if (!el) return;
-    requestAnimationFrame(() => {
-      const first = el.querySelector<HTMLElement>("[data-project-slide]");
-      if (first) {
-        el.scrollLeft = first.offsetLeft + first.offsetWidth / 2 - el.clientWidth / 2;
-      }
-    });
+    if (project && bigScrollerRef.current) {
+      bigScrollerRef.current.scrollLeft = 0;
+    }
   }, [project]);
 
   // Al volver al carrusel de proyectos, centrar el proyecto recién visitado
@@ -379,13 +359,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             {projectsWithFicha.map((p, i) => {
               const portraitLocked =
                 isPortrait && !isCarouselScrolling && enlargedIndex >= 0;
-              const centerReady = fichasReady[p.ficha] ?? false;
               const isCenter = isPortrait
-                ? portraitLocked && i === enlargedIndex && centerReady
+                ? portraitLocked && i === enlargedIndex
                 : i === centeredSmall;
-              const hideNeighbor =
-                portraitLocked && i !== enlargedIndex && centerReady;
-              const isActiveSlide = isPortrait && i === enlargedIndex;
+              const hideNeighbor = portraitLocked && i !== enlargedIndex;
               return (
                 <li
                   key={p.slug}
@@ -393,13 +370,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                   className={`ficha-item shrink-0 flex justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
                 >
                   <button
-                    onClick={() => {
-                      p.images.forEach((src) => {
-                        const img = new Image();
-                        img.src = src;
-                      });
-                      setSelectedIndex(i);
-                    }}
+                    onClick={() => setSelectedIndex(i)}
                     className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
@@ -408,11 +379,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                       alt={p.name}
                       loading="eager"
                       decoding="async"
-                      fetchPriority={i <= 1 ? "high" : "auto"}
-                      onLoad={() => markFichaReady(p.ficha)}
+                      fetchPriority="high"
                       className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
                         isPortrait ? "origin-center" : "origin-bottom"
-                      } ${isCenter ? "is-enlarged" : "is-side"}${isActiveSlide && !centerReady ? " ficha-item-loading" : ""}`}
+                      } ${isCenter ? "is-enlarged" : "is-side"}`}
                       draggable={false}
                     />
                   </button>
@@ -428,25 +398,18 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             className="w-full overflow-x-auto no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <ul
-              className={`flex items-center gap-6 py-6 ${isPortrait ? "px-4 justify-start" : "px-[10vw]"}`}
-              style={{ minHeight: "85vh", width: "max-content" }}
-            >
+            <ul className="flex items-center gap-6 py-6 px-[10vw]" style={{ minHeight: "85vh" }}>
               {project.images.map((src, i) => {
                 const isFicha = i === 0;
                 return (
-                  <li key={src} data-project-slide className="shrink-0 flex items-center justify-center">
+                  <li key={src} data-project-slide className="shrink-0">
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
-                      loading={i < 3 ? "eager" : "lazy"}
-                      decoding={i === 0 ? "sync" : "async"}
+                      loading={i < 2 ? "eager" : "lazy"}
+                      decoding="async"
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`rounded-sm shadow-2xl ring-1 ring-white/15 object-contain ${
-                        isPortrait
-                          ? "max-h-[68vh] max-w-[92vw] w-auto h-auto"
-                          : "block h-[70vh] w-auto"
-                      } ${isFicha ? "cursor-pointer" : ""}`}
+                      className={`block h-[70vh] w-auto rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
                     />
                   </li>

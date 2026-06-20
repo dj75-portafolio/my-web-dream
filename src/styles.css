@@ -222,10 +222,6 @@
       pointer-events: none;
     }
 
-    [data-ficha-scroller] .ficha-item-img.ficha-item-loading {
-      opacity: 0.35;
-    }
-
     [data-ficha-scroller] .ficha-track {
       gap: 0;
       padding-inline: 0;
