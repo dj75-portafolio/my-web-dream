@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import portada from "@/assets/portada.jpg";
 
@@ -20,18 +19,11 @@ const hotspots = [
   { to: "/contacto" as const, label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
 ];
 
-// Posición del QR original en la portada (coordenadas relativas a la imagen)
+// Posición del QR impreso en la portada (coordenadas relativas a la imagen)
 const QR_BOX = { top: "83.8%", left: "34%", width: "31.5%", height: "13.5%" };
+const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
-  const [qrUrl, setQrUrl] = useState("https://lovable.dev");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setQrUrl(window.location.origin);
-    }
-  }, []);
-
   return (
     <div className="min-h-screen w-full bg-[#0d0d0f] flex items-center justify-center">
       <div
@@ -58,9 +50,9 @@ function Index() {
             }}
           />
         ))}
-        {/* Nuevo QR superpuesto sobre el QR original — apunta a este portafolio */}
+        {/* QR funcional superpuesto sobre el QR impreso en la imagen */}
         <div
-          className="absolute z-20 flex items-center justify-center overflow-hidden"
+          className="absolute z-20 flex items-center justify-center overflow-hidden bg-white"
           style={{
             top: QR_BOX.top,
             left: QR_BOX.left,
@@ -70,7 +62,7 @@ function Index() {
           aria-label="Código QR del portafolio"
         >
           <QRCodeSVG
-            value={qrUrl}
+            value={PORTFOLIO_QR_URL}
             level="M"
             bgColor="#ffffff"
             fgColor="#000000"
