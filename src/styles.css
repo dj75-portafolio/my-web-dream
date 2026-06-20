@@ -197,6 +197,31 @@
     transform: scale(1.5);
     opacity: 1;
   }
+
+  /* Indicador click en ficha centrada */
+  [data-ficha-click-hint] .ficha-click-hint-icon {
+    transform: rotate(-12deg);
+  }
+
+  @media (orientation: portrait) {
+    [data-ficha-click-hint] {
+      left: 1rem;
+      top: calc(50% + 30vh);
+      bottom: auto;
+    }
+  }
+
+  @media (orientation: landscape) {
+    [data-ficha-click-hint] {
+      left: 26%;
+      bottom: 28%;
+      top: auto;
+    }
+
+    [data-ficha-click-hint] .ficha-click-hint-icon {
+      transform: rotate(45deg);
+    }
+  }
 }
 
 @keyframes fade-in {

@@ -272,11 +272,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
         {showClickHint && (
           <div
-            className="pointer-events-none absolute left-4 z-30 flex flex-col items-center gap-0.5 animate-fade-in"
-            style={{ bottom: "0.75rem" }}
+            data-ficha-click-hint
+            className="pointer-events-none absolute z-30 flex flex-col items-center gap-0.5 animate-fade-in"
             aria-hidden="true"
           >
-            <Pointer className="h-5 w-5 text-portafolio -rotate-12 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
+            <Pointer className="ficha-click-hint-icon h-5 w-5 text-portafolio drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
             <span className="text-[9px] uppercase tracking-[0.2em] text-portafolio leading-none">
               click
             </span>
