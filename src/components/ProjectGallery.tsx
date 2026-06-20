@@ -115,7 +115,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     <div className="min-h-screen bg-black text-white flex flex-col relative">
       {/* HEADER: título centrado */}
       <header className="px-6 pt-4 pb-2 relative flex items-center justify-center">
-        <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-white whitespace-nowrap">
+        <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
           {project ? project.name : title}
         </h1>
       </header>
@@ -125,7 +125,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         <button
           onClick={() => setSelectedIndex(null)}
           aria-label="Volver"
-          className={`fixed z-50 text-white hover:text-white text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
+          className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
         >
           ←
         </button>
@@ -133,7 +133,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         <Link
           to="/"
           aria-label="Volver"
-          className={`fixed z-50 text-white hover:text-white text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
+          className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
         >
           ←
         </Link>
@@ -203,8 +203,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
           className="pointer-events-none absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-fade-in z-20"
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 100px)" }}
         >
-          <RotateCw className="h-6 w-6 text-white animate-spin-slow" />
-          <span className="text-[11px] uppercase tracking-[0.25em] text-white">
+          <RotateCw className="h-6 w-6 text-portafolio animate-spin-slow" />
+          <span className="text-[11px] uppercase tracking-[0.25em] text-portafolio">
             Girar celular
           </span>
         </div>
@@ -217,7 +217,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             type="button"
             onClick={() => scrollByDir(-1)}
             aria-label="Anterior"
-            className="text-white/60 hover:text-white text-xl leading-none transition"
+            className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
             ←
           </button>
@@ -225,7 +225,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             type="button"
             onClick={() => scrollByDir(1)}
             aria-label="Siguiente"
-            className="text-white/60 hover:text-white text-xl leading-none transition"
+            className="text-portafolio hover:text-portafolio-bright text-xl leading-none transition"
           >
             →
           </button>

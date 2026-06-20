@@ -39,22 +39,22 @@ function ContactoPage() {
     <div className="min-h-screen w-full bg-black flex flex-col relative">
       <Link
         to="/"
-        className="absolute left-2 top-4 z-10 text-sm text-white/40 hover:text-white/80 transition-colors"
+        className="absolute left-2 top-4 z-10 text-sm text-portafolio hover:text-portafolio-bright transition-colors"
         aria-label="Volver a portada"
       >
         ←
       </Link>
 
       <div className="pt-5 pb-2 px-4 text-center">
-        <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-white/85">
+        <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio">
           CONTACTO
         </h1>
       </div>
 
       {isPortrait && (
         <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in z-20 pb-4">
-          <RotateCw className="h-7 w-7 text-white animate-spin-slow" />
-          <span className="text-[12px] uppercase text-white/75">
+          <RotateCw className="h-7 w-7 text-portafolio animate-spin-slow" />
+          <span className="text-[12px] uppercase text-portafolio">
             Girar celular
           </span>
         </div>
