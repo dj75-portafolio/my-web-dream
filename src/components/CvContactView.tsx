@@ -51,7 +51,7 @@ export default function CvContactView({ standalone = false }: Props) {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-black flex flex-col relative">
+    <div className="min-h-[100dvh] w-full bg-black flex flex-col relative">
       <header className="shrink-0 px-6 pt-5 pb-2">
         <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio text-center">
           CONTACTO
@@ -59,52 +59,85 @@ export default function CvContactView({ standalone = false }: Props) {
       </header>
 
       {isPortrait ? (
-        <div className="relative shrink-0">
-          <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pb-4 pt-1">
+        <div className="relative flex-1 flex flex-col justify-end px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          {!standalone && (
+            <BackToPortafolioLink className="absolute left-4 top-6 z-50" />
+          )}
+
+          <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pb-3 pt-2">
             <RotateCw className="h-7 w-7 text-portafolio animate-spin-slow" />
             <span className="text-[12px] uppercase text-portafolio">
               Girar celular
             </span>
           </div>
-          {!standalone && (
-            <BackToPortafolioLink className="absolute left-4 top-1/2 -translate-y-1/2 z-50" />
-          )}
+
+          <div className="flex items-start justify-center w-full">
+            <img
+              src={cvImage}
+              alt="CV Daniel Jaimes"
+              loading="eager"
+              decoding="async"
+              className="h-auto select-none w-full max-w-[420px]"
+              draggable={false}
+            />
+          </div>
+
+          <div className="flex items-center justify-center gap-10 pt-4 pb-1">
+            <a
+              href="https://wa.me/8145942524"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-portafolio hover:text-portafolio-bright transition-colors"
+              aria-label="WhatsApp"
+            >
+              <WhatsAppIcon className="w-10 h-10" />
+            </a>
+            <a
+              href="mailto:dajaimes75@gmail.com"
+              className="text-portafolio hover:text-portafolio-bright transition-colors"
+              aria-label="Correo electrónico"
+            >
+              <Mail className="w-10 h-10" />
+            </a>
+          </div>
         </div>
       ) : (
-        !standalone && <BackToPortafolioLink className="fixed left-3 top-3 z-50" />
+        <>
+          {!standalone && <BackToPortafolioLink className="fixed left-3 top-3 z-50" />}
+
+          <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
+            <div className="flex items-start justify-center w-full">
+              <img
+                src={cvImage}
+                alt="CV Daniel Jaimes"
+                loading="eager"
+                decoding="async"
+                className="h-auto select-none w-full max-w-none"
+                draggable={false}
+              />
+            </div>
+
+            <div className="flex items-center gap-10 pt-6">
+              <a
+                href="https://wa.me/8145942524"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-portafolio hover:text-portafolio-bright transition-colors"
+                aria-label="WhatsApp"
+              >
+                <WhatsAppIcon className="w-10 h-10" />
+              </a>
+              <a
+                href="mailto:dajaimes75@gmail.com"
+                className="text-portafolio hover:text-portafolio-bright transition-colors"
+                aria-label="Correo electrónico"
+              >
+                <Mail className="w-10 h-10" />
+              </a>
+            </div>
+          </div>
+        </>
       )}
-
-      <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
-        <div className="flex items-start justify-center w-full">
-          <img
-            src={cvImage}
-            alt="CV Daniel Jaimes"
-            loading="eager"
-            decoding="async"
-            className={`h-auto select-none w-full ${isPortrait ? "max-w-[420px]" : "max-w-none"}`}
-            draggable={false}
-          />
-        </div>
-
-        <div className="flex items-center gap-10 pt-6">
-          <a
-            href="https://wa.me/8145942524"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-portafolio hover:text-portafolio-bright transition-colors"
-            aria-label="WhatsApp"
-          >
-            <WhatsAppIcon className="w-10 h-10" />
-          </a>
-          <a
-            href="mailto:dajaimes75@gmail.com"
-            className="text-portafolio hover:text-portafolio-bright transition-colors"
-            aria-label="Correo electrónico"
-          >
-            <Mail className="w-10 h-10" />
-          </a>
-        </div>
-      </div>
     </div>
   );
 }
