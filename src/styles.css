@@ -137,6 +137,11 @@
     border-color: var(--color-border);
   }
 
+  html:has([data-portada]),
+  body:has([data-portada]) {
+    background-color: #000000;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

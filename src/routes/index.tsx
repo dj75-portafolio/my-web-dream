@@ -7,6 +7,9 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Daniel Jaimes — Portafolio" },
       { name: "description", content: "Portafolio de Daniel Jaimes: residencial, comercial e industrial." },
+      { name: "theme-color", content: "#000000" },
+      { name: "color-scheme", content: "dark" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black" },
     ],
   }),
   component: Index,
@@ -25,15 +28,15 @@ const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
   return (
-    <div className="min-h-screen w-full bg-[#0d0d0f] flex items-center justify-center">
+    <div data-portada className="min-h-screen w-full bg-black flex items-center justify-center">
       <div
-        className="relative w-full"
+        className="relative w-full bg-black"
         style={{ maxWidth: "min(100vw, calc(100vh * 897 / 1920))" }}
       >
         <img
           src={portada}
           alt="Portafolio Daniel Jaimes"
-          className="block w-full h-auto select-none"
+          className="block w-full h-auto select-none bg-black brightness-[0.96] contrast-[1.08]"
           draggable={false}
         />
         {hotspots.map((h) => (
