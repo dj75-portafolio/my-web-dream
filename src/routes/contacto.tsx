@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import cvImage from "@/assets/contacto/cv-daniel-jaimes-2026.png";
+import cvImage from "@/assets/contacto/cv-daniel-jaimes-2026.webp";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -74,6 +74,8 @@ function ContactoPage() {
           <img
             src={cvImage}
             alt="CV Daniel Jaimes"
+            loading="eager"
+            decoding="async"
             className={`h-auto select-none w-full ${isPortrait ? "max-w-[420px]" : "max-w-none"}`}
             draggable={false}
           />
