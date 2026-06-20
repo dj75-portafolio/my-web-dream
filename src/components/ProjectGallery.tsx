@@ -18,6 +18,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const [showHint, setShowHint] = useState(true);
   const [isPortrait, setIsPortrait] = useState(true);
   const [centeredSmall, setCenteredSmall] = useState(0);
+  const [enlargedIndex, setEnlargedIndex] = useState(0);
+  const [isCarouselScrolling, setIsCarouselScrolling] = useState(false);
 
   const projectsWithFicha = projects
     .map((p) => {
@@ -30,10 +32,59 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
+  const isPortraitRef = useRef(isPortrait);
+
+  useEffect(() => {
+    isPortraitRef.current = isPortrait;
+  }, [isPortrait]);
+
+  const getSnapScrollLeft = (container: HTMLElement, index: number) => {
+    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
+    const target = items[index];
+    if (!target) return 0;
+    return isPortraitRef.current
+      ? target.offsetLeft
+      : target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
+  };
+
+  const isScrollAtSnap = (container: HTMLElement, index: number) =>
+    Math.abs(container.scrollLeft - getSnapScrollLeft(container, index)) < 6;
+
+  const waitForScrollSettle = (container: HTMLElement, index: number, onDone: () => void) => {
+    let frames = 0;
+    const tick = () => {
+      frames += 1;
+      if (isScrollAtSnap(container, index) || frames > 40) {
+        onDone();
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
 
   const getNearestIndex = (container: HTMLElement) => {
-    const center = container.scrollLeft + container.clientWidth / 2;
     const items = Array.from(container.querySelectorAll<HTMLElement>("[data-snap-item]"));
+    if (items.length === 0) return 0;
+
+    if (isPortraitRef.current) {
+      const scroll = container.scrollLeft;
+      const viewW = container.clientWidth;
+      let bestIdx = 0;
+      let bestVisible = -1;
+      items.forEach((el, i) => {
+        const left = el.offsetLeft;
+        const right = left + el.offsetWidth;
+        const visible = Math.max(0, Math.min(right, scroll + viewW) - Math.max(left, scroll));
+        if (visible > bestVisible) {
+          bestVisible = visible;
+          bestIdx = i;
+        }
+      });
+      return bestIdx;
+    }
+
+    const center = container.scrollLeft + container.clientWidth / 2;
     let bestIdx = 0;
     let bestDist = Infinity;
     items.forEach((el, i) => {
@@ -48,11 +99,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   };
 
   const scrollItemToCenter = (container: HTMLElement, index: number, smooth = true) => {
-    const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
-    const target = items[index];
-    if (!target) return;
-    const left = target.offsetLeft + target.offsetWidth / 2 - container.clientWidth / 2;
-    container.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+    container.scrollTo({
+      left: getSnapScrollLeft(container, index),
+      behavior: smooth ? "smooth" : "auto",
+    });
   };
 
   const snapToNearestCenter = (
@@ -64,9 +114,21 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     setIdx(idx);
     isSnappingRef.current = true;
     scrollItemToCenter(container, idx, smooth);
-    window.setTimeout(() => {
-      isSnappingRef.current = false;
-    }, smooth ? 450 : 0);
+
+    const finish = () => {
+      if (isPortraitRef.current) {
+        waitForScrollSettle(container, idx, () => {
+          setEnlargedIndex(idx);
+          isSnappingRef.current = false;
+          setIsCarouselScrolling(false);
+        });
+      } else {
+        setEnlargedIndex(idx);
+        isSnappingRef.current = false;
+      }
+    };
+
+    window.setTimeout(finish, smooth ? 480 : 0);
   };
 
   const scrollByDir = (dir: -1 | 1) => {
@@ -74,11 +136,21 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     if (!el) return;
 
     if (!project) {
+      const activeIdx = isPortrait
+        ? enlargedIndex >= 0
+          ? enlargedIndex
+          : centeredSmall
+        : centeredSmall;
       const next = Math.max(
         0,
-        Math.min(el.querySelectorAll("[data-snap-item]").length - 1, centeredSmall + dir),
+        Math.min(el.querySelectorAll("[data-snap-item]").length - 1, activeIdx + dir),
       );
-      setCenteredSmall(next);
+      if (isPortrait) {
+        setIsCarouselScrolling(true);
+        setEnlargedIndex(-1);
+      } else {
+        setCenteredSmall(next);
+      }
       scrollItemToCenter(el, next);
       return;
     }
@@ -102,21 +174,31 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
     const onScroll = () => {
       if (isSnappingRef.current) return;
+      if (isPortraitRef.current) {
+        setIsCarouselScrolling(true);
+        setEnlargedIndex(-1);
+        clearTimeout(snapTimer);
+        snapTimer = setTimeout(() => {
+          if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
+        }, 280);
+        return;
+      }
       trackCenter(el, setCenteredSmall);
-
       clearTimeout(snapTimer);
       snapTimer = setTimeout(() => {
         if (!isSnappingRef.current) snapToNearestCenter(el, setCenteredSmall);
-      }, 100);
+      }, 150);
     };
 
     const onScrollEnd = () => {
-      if (!isSnappingRef.current) {
-        snapToNearestCenter(el, setCenteredSmall);
-      }
+      clearTimeout(snapTimer);
+      if (isSnappingRef.current) return;
+      snapToNearestCenter(el, setCenteredSmall);
     };
 
-    onScroll();
+    const idx = getNearestIndex(el);
+    setCenteredSmall(idx);
+    setEnlargedIndex(idx);
     el.addEventListener("scroll", onScroll, { passive: true });
     el.addEventListener("scrollend", onScrollEnd);
     return () => {
@@ -136,15 +218,16 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     });
   }, [isPortrait, project]);
 
-  // Detectar orientación
+  // Detectar orientación (portrait = celular vertical)
   useEffect(() => {
-    const update = () => setIsPortrait(window.innerHeight >= window.innerWidth);
+    const mq = window.matchMedia("(orientation: portrait)");
+    const update = () => setIsPortrait(mq.matches);
     update();
+    mq.addEventListener("change", update);
     window.addEventListener("resize", update);
-    window.addEventListener("orientationchange", update);
     return () => {
+      mq.removeEventListener("change", update);
       window.removeEventListener("resize", update);
-      window.removeEventListener("orientationchange", update);
     };
   }, []);
 
@@ -175,7 +258,9 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       const items = el.querySelectorAll<HTMLElement>("[data-snap-item]");
       const target = items[centeredSmall];
       if (target) {
-        el.scrollLeft = target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
+        el.scrollLeft = isPortraitRef.current
+          ? target.offsetLeft
+          : target.offsetLeft + target.offsetWidth / 2 - el.clientWidth / 2;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,52 +269,89 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
       {/* HEADER: título centrado */}
-      <header className="px-6 pt-4 pb-2 relative flex items-center justify-center">
+      <header className="px-6 pt-4 pb-2 relative flex items-center justify-center min-h-[3rem]">
+        {isPortrait &&
+          (project ? (
+            <button
+              onClick={() => setSelectedIndex(null)}
+              aria-label="Volver"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+            >
+              ←
+            </button>
+          ) : (
+            <Link
+              to="/"
+              aria-label="Volver"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+            >
+              ←
+            </Link>
+          ))}
         <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
           {project ? project.name : title}
         </h1>
       </header>
 
-      {/* Flecha volver: posición según orientación */}
-      {project ? (
-        <button
-          onClick={() => setSelectedIndex(null)}
-          aria-label="Volver"
-          className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
-        >
-          ←
-        </button>
-      ) : (
-        <Link
-          to="/"
-          aria-label="Volver"
-          className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
-        >
-          ←
-        </Link>
-      )}
+      {/* Flecha volver en horizontal */}
+      {!isPortrait &&
+        (project ? (
+          <button
+            onClick={() => setSelectedIndex(null)}
+            aria-label="Volver"
+            className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+          >
+            ←
+          </button>
+        ) : (
+          <Link
+            to="/"
+            aria-label="Volver"
+            className="fixed z-50 left-3 top-3 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+          >
+            ←
+          </Link>
+        ))}
 
       <div className="flex-1 flex items-center relative">
         {/* GALERÍA DE FICHAS: siempre montada para conservar el scroll */}
         <div
           ref={smallScrollerRef}
+          data-ficha-scroller
           className={`w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${project ? "hidden" : ""}`}
-          style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: "50vw" }}
+          style={{
+            WebkitOverflowScrolling: "touch",
+            scrollPaddingInline: isPortrait ? "0px" : "50vw",
+          }}
         >
-          <ul className="flex items-end gap-24 pl-[50vw] pr-[50vw] py-8" style={{ minHeight: "70vh", width: "max-content" }}>
+          <ul
+            className={`ficha-track flex items-end py-8 ${isPortrait ? "gap-0" : "gap-24 pl-[50vw] pr-[50vw]"}`}
+            style={{ minHeight: "70vh", width: "max-content" }}
+          >
             {projectsWithFicha.map((p, i) => {
-              const isCenter = i === centeredSmall;
+              const portraitLocked =
+                isPortrait && !isCarouselScrolling && enlargedIndex >= 0;
+              const isCenter = isPortrait
+                ? portraitLocked && i === enlargedIndex
+                : i === centeredSmall;
+              const hideNeighbor = portraitLocked && i !== enlargedIndex;
               return (
-                <li key={p.slug} data-snap-item className="snap-center shrink-0">
+                <li
+                  key={p.slug}
+                  data-snap-item
+                  className={`ficha-item shrink-0 flex items-end justify-center${hideNeighbor ? " ficha-item-hidden" : ""}`}
+                >
                   <button
                     onClick={() => setSelectedIndex(i)}
-                    className="block group"
+                    className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
                     <img
                       src={p.ficha}
                       alt={p.name}
-                      className={`block h-[42vh] max-h-[420px] w-auto rounded-sm shadow-2xl ring-1 ring-white/10 transition-all duration-300 origin-bottom ${isCenter ? "scale-150" : "opacity-70"}`}
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
+                        isCenter ? "is-enlarged" : "is-side"
+                      }`}
                       draggable={false}
                     />
                   </button>
