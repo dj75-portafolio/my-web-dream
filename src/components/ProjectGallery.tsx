@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pointer, RotateCw } from "lucide-react";
 
 export type Project = {
@@ -45,7 +45,11 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     !project && centeredProject !== undefined && centeredProject.images.length > 1;
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
+  const carouselAreaRef = useRef<HTMLDivElement>(null);
   const isSnappingRef = useRef(false);
+  const [landscapeHintPos, setLandscapeHintPos] = useState<{ left: number; top: number } | null>(
+    null,
+  );
 
   // Precargar solo la ficha visible y las vecinas (no todas a la vez)
   useEffect(() => {
@@ -189,6 +193,57 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     }
   }, [project]);
 
+  const updateClickHintPosition = useCallback(() => {
+    if (!showClickHint || isPortrait) {
+      setLandscapeHintPos(null);
+      return;
+    }
+
+    const area = carouselAreaRef.current;
+    const scroller = smallScrollerRef.current;
+    if (!area || !scroller) return;
+
+    const items = scroller.querySelectorAll<HTMLElement>("[data-snap-item]");
+    const item = items[centeredSmall];
+    if (!item) return;
+
+    const img = item.querySelector<HTMLElement>(".ficha-item-img");
+    if (!img) return;
+
+    const areaRect = area.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+
+    setLandscapeHintPos({
+      left: imgRect.left - areaRect.left - 28,
+      top: imgRect.top - areaRect.top - 4,
+    });
+  }, [showClickHint, isPortrait, centeredSmall]);
+
+  useLayoutEffect(() => {
+    const id = requestAnimationFrame(updateClickHintPosition);
+    return () => cancelAnimationFrame(id);
+  }, [updateClickHintPosition]);
+
+  useEffect(() => {
+    if (!showClickHint || isPortrait) return;
+
+    window.addEventListener("resize", updateClickHintPosition);
+    const scroller = smallScrollerRef.current;
+    scroller?.addEventListener("scroll", updateClickHintPosition, { passive: true });
+
+    const item = scroller?.querySelectorAll<HTMLElement>("[data-snap-item]")[centeredSmall];
+    const img = item?.querySelector<HTMLImageElement>(".ficha-item-img");
+    const onLoad = () => updateClickHintPosition();
+    img?.addEventListener("load", onLoad);
+    if (img?.complete) onLoad();
+
+    return () => {
+      window.removeEventListener("resize", updateClickHintPosition);
+      scroller?.removeEventListener("scroll", updateClickHintPosition);
+      img?.removeEventListener("load", onLoad);
+    };
+  }, [showClickHint, isPortrait, centeredSmall, updateClickHintPosition]);
+
   useLayoutEffect(() => {
     if (!project && smallScrollerRef.current) {
       const el = smallScrollerRef.current;
@@ -262,7 +317,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
           </Link>
         ))}
 
-      <div className="flex-1 flex items-center relative">
+      <div ref={carouselAreaRef} className="flex-1 flex items-center relative">
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
@@ -302,7 +357,14 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         {showClickHint && (
           <div
             data-ficha-click-hint
-            className="pointer-events-none absolute z-30 flex flex-col items-center gap-0.5 animate-fade-in"
+            className={`pointer-events-none absolute z-30 flex flex-col gap-0.5 animate-fade-in ${
+              isPortrait ? "items-center" : "items-start"
+            }`}
+            style={
+              !isPortrait && landscapeHintPos
+                ? { left: landscapeHintPos.left, top: landscapeHintPos.top }
+                : undefined
+            }
             aria-hidden="true"
           >
             <Pointer className="ficha-click-hint-icon h-5 w-5 text-portafolio drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" />
