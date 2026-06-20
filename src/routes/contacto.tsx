@@ -37,19 +37,22 @@ function ContactoPage() {
 
   return (
     <div className="min-h-screen w-full bg-black flex flex-col relative">
-      <Link
-        to="/"
-        aria-label="Volver a portada"
-        className={`fixed z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${isPortrait ? "left-6 top-[120px]" : "left-3 top-3"}`}
-      >
-        ←
-      </Link>
-
-      <div className="pt-5 pb-2 px-4 text-center">
-        <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio">
+      <header className="relative shrink-0 px-6 pt-5 pb-2">
+        <Link
+          to="/"
+          aria-label="Volver a portada"
+          className={`z-50 text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] ${
+            isPortrait
+              ? "absolute left-4 top-1/2 -translate-y-1/2"
+              : "fixed left-3 top-3"
+          }`}
+        >
+          ←
+        </Link>
+        <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio text-center">
           CONTACTO
         </h1>
-      </div>
+      </header>
 
       {isPortrait && (
         <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in z-20 pb-4">
