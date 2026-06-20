@@ -20,6 +20,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   const [centeredSmall, setCenteredSmall] = useState(0);
   const [enlargedIndex, setEnlargedIndex] = useState(0);
   const [isCarouselScrolling, setIsCarouselScrolling] = useState(false);
+  const [fichasReady, setFichasReady] = useState<Record<string, boolean>>({});
 
   const projectsWithFicha = projects
     .map((p) => {
@@ -37,6 +38,25 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
   useEffect(() => {
     isPortraitRef.current = isPortrait;
   }, [isPortrait]);
+
+  const markFichaReady = (src: string) => {
+    setFichasReady((prev) => (prev[src] ? prev : { ...prev, [src]: true }));
+  };
+
+  // Precargar fichas del carrusel y las primeras imágenes de cada proyecto
+  useEffect(() => {
+    if (project) return;
+    projectsWithFicha.forEach(({ ficha, images }) => {
+      [ficha, ...images.slice(1, 4)].forEach((src) => {
+        if (fichasReady[src]) return;
+        const img = new Image();
+        img.onload = () => markFichaReady(src);
+        img.onerror = () => markFichaReady(src);
+        img.src = src;
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project, projectsWithFicha.length]);
 
   const getSnapScrollLeft = (container: HTMLElement, index: number) => {
     const items = container.querySelectorAll<HTMLElement>("[data-snap-item]");
@@ -349,10 +369,13 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             {projectsWithFicha.map((p, i) => {
               const portraitLocked =
                 isPortrait && !isCarouselScrolling && enlargedIndex >= 0;
+              const centerReady = fichasReady[p.ficha] ?? false;
               const isCenter = isPortrait
-                ? portraitLocked && i === enlargedIndex
+                ? portraitLocked && i === enlargedIndex && centerReady
                 : i === centeredSmall;
-              const hideNeighbor = portraitLocked && i !== enlargedIndex;
+              const hideNeighbor =
+                portraitLocked && i !== enlargedIndex && centerReady;
+              const isActiveSlide = isPortrait && i === enlargedIndex;
               return (
                 <li
                   key={p.slug}
@@ -367,9 +390,13 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                     <img
                       src={p.ficha}
                       alt={p.name}
+                      loading="eager"
+                      decoding="async"
+                      fetchPriority={i <= 1 ? "high" : "auto"}
+                      onLoad={() => markFichaReady(p.ficha)}
                       className={`ficha-item-img rounded-sm ring-1 ring-white/10 ${
                         isPortrait ? "origin-center" : "origin-bottom"
-                      } ${isCenter ? "is-enlarged" : "is-side"}`}
+                      } ${isCenter ? "is-enlarged" : "is-side"}${isActiveSlide && !centerReady ? " ficha-item-loading" : ""}`}
                       draggable={false}
                     />
                   </button>
@@ -393,6 +420,8 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                     <img
                       src={src}
                       alt={`${project.name} ${isFicha ? "ficha" : i}`}
+                      loading={i < 2 ? "eager" : "lazy"}
+                      decoding="async"
                       onClick={isFicha ? () => setSelectedIndex(null) : undefined}
                       className={`block h-[70vh] w-auto rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
                       draggable={false}
