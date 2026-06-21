@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
+import PortadaSignature from "@/components/PortadaSignature";
 import portada from "@/assets/portada.jpg";
 
 export const Route = createFileRoute("/")({
@@ -39,6 +40,7 @@ function Index() {
           className="block w-full h-auto select-none bg-black"
           draggable={false}
         />
+        <PortadaSignature />
         {hotspots.map((h) => (
           <Link
             key={h.to}
