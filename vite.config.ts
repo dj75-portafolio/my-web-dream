@@ -30,7 +30,12 @@ export default defineConfig({
           prerender: {
             enabled: true,
             crawlLinks: true,
-            pages: [{ path: "/cv-dj" }],
+            pages: [
+              { path: "/cv-dj" },
+              { path: "/cv" },
+              { path: "/my-web-dream/cv-dj" },
+              { path: "/my-web-dream/cv" },
+            ],
           },
         }
       : {}),
