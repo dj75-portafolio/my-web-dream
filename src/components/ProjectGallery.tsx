@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pointer, RotateCw } from "lucide-react";
+import TypewriterText from "@/components/TypewriterText";
 
 export type Project = {
   slug: string;
@@ -287,13 +288,13 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                 : "text-xl tracking-[0.2em] whitespace-nowrap"
             }`}
           >
-            {titleText}
+            {project ? titleText : <TypewriterText text={title.toUpperCase()} />}
           </h1>
         </header>
       ) : (
         <header className="relative z-50 shrink-0 bg-black px-6 pt-4 pb-2 flex items-center justify-center min-h-[3rem]">
           <h1 className="text-xl md:text-2xl font-bold uppercase tracking-[0.2em] text-portafolio whitespace-nowrap">
-            {titleText}
+            {project ? titleText : <TypewriterText text={title.toUpperCase()} />}
           </h1>
         </header>
       )}

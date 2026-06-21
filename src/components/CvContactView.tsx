@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
+import TypewriterText from "@/components/TypewriterText";
 import { getCvImageUrl } from "@/lib/cv";
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -50,7 +51,7 @@ export default function CvContactView() {
     <div className="min-h-[100dvh] w-full bg-black flex flex-col relative">
       <header className="shrink-0 px-6 pt-5 pb-2">
         <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio text-center">
-          CONTACTO
+          <TypewriterText text="CONTACTO" />
         </h1>
       </header>
 

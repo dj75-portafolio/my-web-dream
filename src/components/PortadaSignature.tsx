@@ -1,12 +1,8 @@
 import nameStrip from "@/assets/portada-name.webp";
 import { Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useTypewriterProgress } from "@/hooks/useTypewriterProgress";
 
 const SIGNATURE = "ARQ. DANIEL JAIMES";
-/** +1.3% sobre 160ms / 38ms por carácter */
-const SPEED_FACTOR = 1.013;
-const START_MS = Math.round(160 / SPEED_FACTOR);
-const charMs = (step: number) => (step % 2 === 1 ? 37 : 38);
 
 /** Zona exacta del nombre en portada.jpg (768×1376, medida sobre original 9am) */
 const SIGNATURE_BOX = {
@@ -17,33 +13,7 @@ const SIGNATURE_BOX = {
 } as const;
 
 export default function PortadaSignature() {
-  const [visible, setVisible] = useState(0);
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    let count = 0;
-    let cancelled = false;
-    let timeoutId = 0;
-
-    const tick = () => {
-      if (cancelled) return;
-      count += 1;
-      setVisible(count);
-      if (count >= SIGNATURE.length) {
-        setDone(true);
-        return;
-      }
-      timeoutId = window.setTimeout(tick, charMs(count));
-    };
-
-    timeoutId = window.setTimeout(tick, START_MS);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
-
-  const progress = visible / SIGNATURE.length;
+  const { visible, done, progress } = useTypewriterProgress(SIGNATURE.length);
 
   return (
     <div
