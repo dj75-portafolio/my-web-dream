@@ -31,7 +31,7 @@ function Index() {
   return (
     <div data-portada className="min-h-screen w-full bg-black flex items-center justify-center">
       <div
-        className="relative w-full bg-black"
+        className="relative w-full bg-black [container-type:inline-size]"
         style={{ maxWidth: "min(100vw, calc(100vh * 897 / 1920))" }}
       >
         <img

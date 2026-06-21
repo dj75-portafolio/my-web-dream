@@ -2,7 +2,6 @@ import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SIGNATURE = "ARQ. DANIEL JAIMES";
-/** ms por carácter: fluido, ~1.6 s en total */
 const CHAR_MS = 78;
 
 export default function PortadaSignature() {
@@ -32,35 +31,30 @@ export default function PortadaSignature() {
     };
   }, []);
 
+  const chars = SIGNATURE.slice(0, visible).split("");
+
   return (
     <div
-      className="absolute z-[5] pointer-events-none overflow-hidden bg-black"
+      data-portada-signature
+      className="absolute z-[5] pointer-events-none bg-black"
       style={{
-        right: "4.2%",
-        top: "27%",
-        height: "46%",
-        width: "9%",
+        right: "1.2%",
+        top: "25.5%",
+        height: "49%",
+        width: "12%",
       }}
       aria-hidden="true"
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="flex items-center gap-1 text-portafolio font-semibold uppercase whitespace-nowrap"
-          style={{
-            transform: "rotate(-90deg)",
-            fontSize: "clamp(10px, 2.4vw, 13px)",
-            letterSpacing: "0.32em",
-          }}
-        >
-          <span>{SIGNATURE.slice(0, visible)}</span>
-          {!done && (
+        <div className="flex flex-col-reverse items-center gap-[0.22em] text-portafolio font-semibold uppercase leading-none portada-signature-text">
+          {chars.map((char, i) => (
+            <span key={`${i}-${char}`} className="block">
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
+          {!done && visible > 0 && (
             <Pencil
-              className="shrink-0 text-portafolio opacity-90"
-              style={{
-                width: "0.85em",
-                height: "0.85em",
-                transform: "rotate(12deg)",
-              }}
+              className="shrink-0 text-portafolio opacity-90 portada-signature-pencil"
               strokeWidth={2.2}
             />
           )}

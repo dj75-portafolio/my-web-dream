@@ -160,6 +160,18 @@
     color: #757575;
   }
 
+  /* Portada: nombre vertical — mismo tamaño que la imagen original */
+  .portada-signature-text {
+    font-size: clamp(10.5px, 3.15cqi, 13.5px);
+    letter-spacing: 0.04em;
+  }
+
+  .portada-signature-pencil {
+    width: 0.9em;
+    height: 0.9em;
+    transform: rotate(-18deg);
+  }
+
   /* Carrusel fichas — igual en todas las secciones */
   [data-ficha-scroller] .ficha-track {
     gap: 6rem;
