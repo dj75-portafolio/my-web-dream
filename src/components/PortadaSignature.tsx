@@ -1,15 +1,16 @@
+import nameStrip from "@/assets/portada-name.webp";
 import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SIGNATURE = "ARQ. DANIEL JAIMES";
 const CHAR_MS = 78;
 
-/** Zona exacta del nombre en portada.jpg (768×1376, medida sobre original) */
+/** Zona exacta del nombre en portada.jpg (768×1376, medida sobre original 9am) */
 const SIGNATURE_BOX = {
-  left: "86%",
-  top: "16%",
-  width: "9%",
-  height: "62%",
+  left: "86.59%",
+  top: "9.45%",
+  width: "9.11%",
+  height: "82.85%",
 } as const;
 
 export default function PortadaSignature() {
@@ -39,6 +40,8 @@ export default function PortadaSignature() {
     };
   }, []);
 
+  const progress = visible / SIGNATURE.length;
+
   return (
     <div
       data-portada-signature
@@ -46,31 +49,31 @@ export default function PortadaSignature() {
       style={SIGNATURE_BOX}
       aria-hidden="true"
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="flex items-center gap-1 font-semibold uppercase whitespace-nowrap"
-          style={{
-            transform: "rotate(-90deg)",
-            color: "#5e5e5e",
-            fontSize: "clamp(24px, 5.2cqi, 42px)",
-            letterSpacing: "0.32em",
-          }}
-        >
-          <span>{SIGNATURE.slice(0, visible)}</span>
-          {!done && (
-            <Pencil
-              className="shrink-0 opacity-90"
-              style={{
-                width: "0.85em",
-                height: "0.85em",
-                color: "#5e5e5e",
-                transform: "rotate(12deg)",
-              }}
-              strokeWidth={2.2}
-            />
-          )}
-        </div>
+      <div
+        className="absolute bottom-0 left-0 right-0 overflow-hidden"
+        style={{ height: `${progress * 100}%` }}
+      >
+        <img
+          src={nameStrip}
+          alt=""
+          className="absolute bottom-0 left-0 h-full w-full object-contain object-bottom"
+          draggable={false}
+        />
       </div>
+
+      {!done && visible > 0 && (
+        <Pencil
+          className="absolute left-1/2 opacity-90 text-[#5e5e5e]"
+          style={{
+            bottom: `calc(${progress * 100}% + 2px)`,
+            width: "0.55em",
+            height: "0.55em",
+            fontSize: "clamp(28px, 6cqi, 52px)",
+            transform: "translateX(-50%) rotate(-18deg)",
+          }}
+          strokeWidth={2.2}
+        />
+      )}
     </div>
   );
 }
