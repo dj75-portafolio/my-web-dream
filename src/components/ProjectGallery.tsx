@@ -345,7 +345,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                       decoding="async"
                       className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
                         isCenter ? "is-enlarged" : "is-side"
-                      }`}
+                      }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
                       draggable={false}
                     />
                   </button>

@@ -176,11 +176,10 @@
 
   [data-ficha-scroller] .ficha-item-img {
     display: block;
-    height: 42vh;
-    max-height: 420px;
-    max-width: min(88vw, 700px);
-    width: auto;
+    width: min(88vw, 700px);
+    height: min(42vh, 420px);
     object-fit: contain;
+    object-position: bottom center;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     transform-origin: bottom center;
     transition:
@@ -196,6 +195,11 @@
   [data-ficha-scroller] .ficha-item-img.is-enlarged {
     transform: scale(1.5);
     opacity: 1;
+  }
+
+  /* Proyecto Zolino: misma proporción visual que fichas industriales vecinas */
+  [data-ficha-scroller] .ficha-item-img.ficha-item-img--zolino {
+    height: min(calc(min(88vw, 700px) / 1.858), min(42vh, 420px));
   }
 
   /* Galería proyecto: más grande que ficha centrada del carrusel (~63vh) */
