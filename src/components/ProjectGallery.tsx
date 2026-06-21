@@ -318,7 +318,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
           </Link>
         ))}
 
-      <div ref={carouselAreaRef} className="flex-1 flex items-center relative">
+      <div
+        ref={carouselAreaRef}
+        className={`flex-1 flex relative ${!project && isPortrait ? "items-start" : "items-center"}`}
+      >
         <div
           ref={smallScrollerRef}
           data-ficha-scroller
@@ -327,7 +330,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         >
           <ul
             className="ficha-track flex items-end gap-24 py-8 pl-[50vw] pr-[50vw]"
-            style={{ minHeight: "70vh", width: "max-content" }}
+            style={{
+              minHeight: !project && isPortrait ? "54vh" : "70vh",
+              width: "max-content",
+            }}
           >
             {projectsWithFicha.map((p, i) => {
               const isCenter = i === centeredSmall;
