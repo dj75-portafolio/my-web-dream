@@ -320,7 +320,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
 
       <div
         ref={carouselAreaRef}
-        className={`flex-1 flex relative ${!project && isPortrait ? "items-start pt-12" : "items-center"}`}
+        className={`flex-1 flex relative ${!project && isPortrait ? "items-start" : "items-center"}`}
       >
         <div
           ref={smallScrollerRef}
@@ -331,7 +331,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
           <ul
             className="ficha-track flex items-end gap-24 py-8 pl-[50vw] pr-[50vw]"
             style={{
-              minHeight: !project && isPortrait ? "68vh" : "70vh",
+              minHeight: !project && isPortrait ? "54vh" : "70vh",
               width: "max-content",
             }}
           >
@@ -422,11 +422,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         </div>
       )}
 
-      <div
-        className={`px-6 pt-2 text-center flex justify-center ${
-          isPortrait ? "pb-[max(3.25rem,env(safe-area-inset-bottom)+1.25rem)]" : "pb-12"
-        }`}
-      >
+      <div className="px-6 pb-12 pt-2 text-center flex justify-center">
         <div className="flex items-center gap-6">
           <button
             type="button"
