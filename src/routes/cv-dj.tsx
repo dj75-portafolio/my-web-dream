@@ -20,5 +20,5 @@ export const Route = createFileRoute("/cv-dj")({
 });
 
 function CvDjPage() {
-  return <CvContactView standalone />;
+  return <CvContactView />;
 }

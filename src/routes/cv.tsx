@@ -21,5 +21,5 @@ export const Route = createFileRoute("/cv")({
 });
 
 function CvPage() {
-  return <CvContactView standalone />;
+  return <CvContactView />;
 }

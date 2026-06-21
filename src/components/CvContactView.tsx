@@ -16,11 +16,6 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-type Props = {
-  /** Enlace directo al CV: sin flecha para volver al portafolio */
-  standalone?: boolean;
-};
-
 function BackToPortafolioLink({ className }: { className: string }) {
   return (
     <Link
@@ -36,7 +31,7 @@ function BackToPortafolioLink({ className }: { className: string }) {
   );
 }
 
-export default function CvContactView({ standalone = false }: Props) {
+export default function CvContactView() {
   const [isPortrait, setIsPortrait] = useState(true);
   const cvImage = getCvImageUrl();
 
@@ -59,11 +54,9 @@ export default function CvContactView({ standalone = false }: Props) {
         </h1>
       </header>
 
-      {!standalone && (
-        <div className="shrink-0 pl-4 pt-1 pb-3">
-          <BackToPortafolioLink className="relative z-50" />
-        </div>
-      )}
+      <div className="shrink-0 pl-4 pt-1 pb-3 min-h-[2.25rem]">
+        <BackToPortafolioLink className="relative z-50" />
+      </div>
 
       {isPortrait ? (
         <div className="relative flex-1 flex flex-col justify-end px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
