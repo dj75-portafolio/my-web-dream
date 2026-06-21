@@ -52,14 +52,17 @@ export default function CvContactView({ standalone = false }: Props) {
 
   return (
     <div className="min-h-[100dvh] w-full bg-black flex flex-col relative">
-      <header className="relative shrink-0 px-6 pt-5 pb-2">
-        {!standalone && (
-          <BackToPortafolioLink className="absolute left-4 top-1/2 -translate-y-1/2 z-50" />
-        )}
+      <header className="shrink-0 px-6 pt-5 pb-2">
         <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio text-center">
           CONTACTO
         </h1>
       </header>
+
+      {!standalone && (
+        <div className="shrink-0 pl-4 pt-1 pb-3">
+          <BackToPortafolioLink className="relative z-50" />
+        </div>
+      )}
 
       {isPortrait ? (
         <div className="relative flex-1 flex flex-col justify-end px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
