@@ -160,16 +160,18 @@
     color: #757575;
   }
 
-  /* Portada: nombre vertical — mismo tamaño que la imagen original */
+  /* Portada: nombre vertical — calzado a la imagen original */
   .portada-signature-text {
-    font-size: clamp(10.5px, 3.15cqi, 13.5px);
+    font-size: clamp(11px, 1.72cqi, 13.5px);
+    font-weight: 600;
+    color: #5e5e5e;
     letter-spacing: 0.04em;
+    line-height: 1;
   }
 
   .portada-signature-pencil {
-    width: 0.9em;
-    height: 0.9em;
-    transform: rotate(-18deg);
+    width: 0.85em;
+    height: 0.85em;
   }
 
   /* Carrusel fichas — igual en todas las secciones */
