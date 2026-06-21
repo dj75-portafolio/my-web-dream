@@ -52,7 +52,10 @@ export default function CvContactView({ standalone = false }: Props) {
 
   return (
     <div className="min-h-[100dvh] w-full bg-black flex flex-col relative">
-      <header className="shrink-0 px-6 pt-5 pb-2">
+      <header className="relative shrink-0 px-6 pt-5 pb-2">
+        {!standalone && (
+          <BackToPortafolioLink className="absolute left-4 top-1/2 -translate-y-1/2 z-50" />
+        )}
         <h1 className="text-[16px] leading-none uppercase tracking-[0.5em] text-portafolio text-center">
           CONTACTO
         </h1>
@@ -60,10 +63,6 @@ export default function CvContactView({ standalone = false }: Props) {
 
       {isPortrait ? (
         <div className="relative flex-1 flex flex-col justify-end px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-          {!standalone && (
-            <BackToPortafolioLink className="absolute left-4 top-6 z-50" />
-          )}
-
           <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pt-2 mb-8">
             <RotateCw className="h-7 w-7 text-portafolio animate-spin-slow" />
             <span className="text-[12px] uppercase text-portafolio">
@@ -102,10 +101,7 @@ export default function CvContactView({ standalone = false }: Props) {
           </div>
         </div>
       ) : (
-        <>
-          {!standalone && <BackToPortafolioLink className="fixed left-3 top-3 z-50" />}
-
-          <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
+        <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
             <div className="flex items-start justify-center w-full">
               <img
                 src={cvImage}
@@ -136,7 +132,6 @@ export default function CvContactView({ standalone = false }: Props) {
               </a>
             </div>
           </div>
-        </>
       )}
     </div>
   );
