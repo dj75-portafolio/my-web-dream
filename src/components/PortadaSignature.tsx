@@ -3,7 +3,7 @@ import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const SIGNATURE = "ARQ. DANIEL JAIMES";
-const CHAR_MS = 78;
+const CHAR_MS = 55;
 
 /** Zona exacta del nombre en portada.jpg (768×1376, medida sobre original 9am) */
 const SIGNATURE_BOX = {
@@ -33,7 +33,7 @@ export default function PortadaSignature() {
       timeoutId = window.setTimeout(tick, CHAR_MS);
     };
 
-    timeoutId = window.setTimeout(tick, 400);
+    timeoutId = window.setTimeout(tick, 280);
     return () => {
       cancelled = true;
       window.clearTimeout(timeoutId);
