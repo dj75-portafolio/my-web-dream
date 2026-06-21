@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 const SIGNATURE = "ARQ. DANIEL JAIMES";
 const CHAR_MS = 78;
 
-/** Zona del nombre (medida sobre portada.jpg 768×1376) */
+/** Zona exacta del nombre en portada.jpg (768×1376, medida sobre original) */
 const SIGNATURE_BOX = {
-  left: "87.6%",
-  top: "22%",
-  width: "6.8%",
-  height: "54.5%",
+  left: "86%",
+  top: "16%",
+  width: "9%",
+  height: "62%",
 } as const;
 
 export default function PortadaSignature() {
@@ -39,45 +39,37 @@ export default function PortadaSignature() {
     };
   }, []);
 
-  const progress = visible / SIGNATURE.length;
-  const chars = SIGNATURE.split("");
-
   return (
     <div
       data-portada-signature
-      className="absolute z-[5] pointer-events-none"
-      style={{
-        left: SIGNATURE_BOX.left,
-        top: SIGNATURE_BOX.top,
-        width: SIGNATURE_BOX.width,
-        height: SIGNATURE_BOX.height,
-      }}
+      className="absolute z-[5] pointer-events-none overflow-hidden bg-black"
+      style={SIGNATURE_BOX}
       aria-hidden="true"
     >
-      <div className="relative h-full w-full">
+      <div className="absolute inset-0 flex items-center justify-center">
         <div
-          className="absolute bottom-0 left-0 right-0 overflow-hidden"
-          style={{ height: `${progress * 100}%` }}
+          className="flex items-center gap-1 font-semibold uppercase whitespace-nowrap"
+          style={{
+            transform: "rotate(-90deg)",
+            color: "#5e5e5e",
+            fontSize: "clamp(24px, 5.2cqi, 42px)",
+            letterSpacing: "0.32em",
+          }}
         >
-          <div className="absolute bottom-0 left-1/2 flex -translate-x-1/2 flex-col-reverse items-center gap-[0.34em] portada-signature-text">
-            {chars.map((char, i) => (
-              <span key={i} className="block">
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
-          </div>
+          <span>{SIGNATURE.slice(0, visible)}</span>
+          {!done && (
+            <Pencil
+              className="shrink-0 opacity-90"
+              style={{
+                width: "0.85em",
+                height: "0.85em",
+                color: "#5e5e5e",
+                transform: "rotate(12deg)",
+              }}
+              strokeWidth={2.2}
+            />
+          )}
         </div>
-
-        {!done && visible > 0 && (
-          <Pencil
-            className="absolute left-1/2 portada-signature-pencil -translate-x-1/2 text-portafolio opacity-90"
-            style={{
-              bottom: `calc(${progress * 100}% + 2px)`,
-              transform: "translateX(-50%) rotate(-18deg)",
-            }}
-            strokeWidth={2.2}
-          />
-        )}
       </div>
     </div>
   );
