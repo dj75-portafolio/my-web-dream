@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
-import cvImage from "@/assets/contacto/cv-daniel-jaimes-2026.webp";
+import { getCvImageUrl } from "@/lib/cv";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -38,6 +38,7 @@ function BackToPortafolioLink({ className }: { className: string }) {
 
 export default function CvContactView({ standalone = false }: Props) {
   const [isPortrait, setIsPortrait] = useState(true);
+  const cvImage = getCvImageUrl();
 
   useEffect(() => {
     const update = () => setIsPortrait(window.innerHeight >= window.innerWidth);
