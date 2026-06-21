@@ -422,7 +422,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
         </div>
       )}
 
-      <div className="px-6 pb-12 pt-2 text-center flex justify-center">
+      <div className={`px-6 pt-2 text-center flex justify-center ${isPortrait ? "pb-16" : "pb-12"}`}>
         <div className="flex items-center gap-6">
           <button
             type="button"

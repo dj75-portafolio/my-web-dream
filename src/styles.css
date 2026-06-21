@@ -222,7 +222,7 @@
 
     [data-ficha-click-hint] {
       left: 1rem;
-      top: calc(50% + 18vh);
+      top: calc(50% + 14vh);
       bottom: auto;
     }
   }
