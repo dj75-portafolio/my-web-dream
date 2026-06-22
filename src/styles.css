@@ -231,20 +231,6 @@
   }
 
   @media (orientation: landscape) {
-    [data-ficha-scroller] .ficha-item {
-      padding-inline: 2rem;
-    }
-
-    [data-ficha-scroller] .ficha-item-img {
-      height: min(72vh, 380px);
-      max-width: min(40vw, 360px);
-      width: auto;
-    }
-
-    [data-ficha-scroller] .ficha-item-img.is-enlarged {
-      transform: scale(1.35);
-    }
-
     [data-ficha-click-hint] .ficha-click-hint-icon {
       transform: rotate(135deg);
     }
