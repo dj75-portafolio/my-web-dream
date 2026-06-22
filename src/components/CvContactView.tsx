@@ -35,6 +35,8 @@ function BackToPortafolioLink({ className }: { className: string }) {
 export default function CvContactView() {
   const [isPortrait, setIsPortrait] = useState(true);
   const cvImage = getCvImageUrl();
+  const cvImageClassName =
+    "h-auto select-none w-full max-w-none block brightness-[0.88] contrast-[0.9]";
 
   useEffect(() => {
     const update = () => setIsPortrait(window.innerHeight >= window.innerWidth);
@@ -74,7 +76,7 @@ export default function CvContactView() {
               alt="CV Daniel Jaimes"
               loading="eager"
               decoding="async"
-              className="h-auto select-none w-full max-w-none block"
+              className={cvImageClassName}
               draggable={false}
             />
           </div>
@@ -106,7 +108,7 @@ export default function CvContactView() {
                 alt="CV Daniel Jaimes"
                 loading="eager"
                 decoding="async"
-                className="h-auto select-none w-full max-w-none block"
+                className={cvImageClassName}
                 draggable={false}
               />
             </div>
