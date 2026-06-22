@@ -32,9 +32,11 @@ export function getProjectImages(slug: string): string[] {
 
   const urls = entries.map((e) => e.url);
 
-  if (slug === "cocina-industrial-panama" && urls.length > 3) {
+  if (slug === "cocina-industrial-panama" && urls.length > 6) {
     const ordered = [...urls];
     [ordered[1], ordered[3]] = [ordered[3], ordered[1]];
+    const [third] = ordered.splice(2, 1);
+    ordered.splice(6, 0, third);
     return ordered;
   }
 
