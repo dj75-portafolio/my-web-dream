@@ -68,6 +68,13 @@ export function getProjectImages(slug: string): string[] {
     return [fichaUrl, ...afterFicha, ...rest];
   }
 
+  if (slug === "casa-pozos") {
+    const ordered = [...urls];
+    const [sixth] = ordered.splice(5, 1);
+    ordered.splice(3, 0, sixth);
+    return ordered;
+  }
+
   return urls;
 }
 
