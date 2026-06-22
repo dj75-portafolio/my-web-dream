@@ -60,7 +60,7 @@ export default function CvContactView() {
       </div>
 
       {isPortrait ? (
-        <div className="relative flex-1 flex flex-col justify-end px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="relative flex-1 flex flex-col justify-end pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <div className="pointer-events-none flex flex-col items-center gap-1 animate-fade-in pt-2 mb-8">
             <RotateCw className="h-7 w-7 text-portafolio animate-spin-slow" />
             <span className="text-[12px] uppercase text-portafolio">
@@ -68,13 +68,13 @@ export default function CvContactView() {
             </span>
           </div>
 
-          <div className="flex items-start justify-center w-full">
+          <div className="flex items-start justify-start w-full">
             <img
               src={cvImage}
               alt="CV Daniel Jaimes"
               loading="eager"
               decoding="async"
-              className="h-auto select-none w-full max-w-[420px]"
+              className="h-auto select-none w-full max-w-none block"
               draggable={false}
             />
           </div>
@@ -99,14 +99,14 @@ export default function CvContactView() {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center w-full px-2 sm:px-4 pb-8">
-            <div className="flex items-start justify-center w-full">
+        <div className="flex flex-col items-stretch w-full pb-8">
+            <div className="flex items-start justify-start w-full">
               <img
                 src={cvImage}
                 alt="CV Daniel Jaimes"
                 loading="eager"
                 decoding="async"
-                className="h-auto select-none w-full max-w-none"
+                className="h-auto select-none w-full max-w-none block"
                 draggable={false}
               />
             </div>
