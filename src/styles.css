@@ -176,8 +176,9 @@
 
   [data-ficha-scroller] .ficha-item-img {
     display: block;
-    width: min(88vw, 700px);
     height: min(42vh, 420px);
+    max-width: min(88vw, 700px);
+    width: auto;
     object-fit: contain;
     object-position: bottom center;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
@@ -200,6 +201,8 @@
   /* Proyecto Zolino: misma proporción visual que fichas industriales vecinas */
   [data-ficha-scroller] .ficha-item-img.ficha-item-img--zolino {
     height: min(calc(min(88vw, 700px) / 1.858), min(42vh, 420px));
+    width: auto;
+    max-width: min(88vw, 700px);
   }
 
   /* Galería proyecto: más grande que ficha centrada del carrusel (~63vh) */
@@ -228,23 +231,18 @@
   }
 
   @media (orientation: landscape) {
-    [data-ficha-scroller] .ficha-track {
-      gap: 2.5rem;
+    [data-ficha-scroller] .ficha-item {
+      padding-inline: 2rem;
     }
 
     [data-ficha-scroller] .ficha-item-img {
+      height: min(72vh, 380px);
+      max-width: min(40vw, 360px);
       width: auto;
-      max-width: min(50vw, 420px);
-      height: min(78vh, 420px);
     }
 
-    [data-project-scroller] ul {
-      gap: 1.25rem;
-    }
-
-    [data-project-scroller] .project-gallery-img {
-      max-width: min(72vw, 900px);
-      object-fit: contain;
+    [data-ficha-scroller] .ficha-item-img.is-enlarged {
+      transform: scale(1.35);
     }
 
     [data-ficha-click-hint] .ficha-click-hint-icon {
