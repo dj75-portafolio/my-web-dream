@@ -228,6 +228,25 @@
   }
 
   @media (orientation: landscape) {
+    [data-ficha-scroller] .ficha-track {
+      gap: 2.5rem;
+    }
+
+    [data-ficha-scroller] .ficha-item-img {
+      width: auto;
+      max-width: min(50vw, 420px);
+      height: min(78vh, 420px);
+    }
+
+    [data-project-scroller] ul {
+      gap: 1.25rem;
+    }
+
+    [data-project-scroller] .project-gallery-img {
+      max-width: min(72vw, 900px);
+      object-fit: contain;
+    }
+
     [data-ficha-click-hint] .ficha-click-hint-icon {
       transform: rotate(135deg);
     }

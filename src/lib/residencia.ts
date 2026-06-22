@@ -68,6 +68,34 @@ export function getProjectImages(slug: string): string[] {
     return [fichaUrl, ...afterFicha, ...rest];
   }
 
+  if (slug === "casa-pozos") {
+    const byFile = new Map(entries.map((e) => [e.file, e.url]));
+    const afterFichaFiles = [
+      "pozos-01-render.webp",
+      "pozos-04.webp",
+      "pozos-07.webp",
+      "pozos-05.webp",
+      "pozos-06.webp",
+      "pozos-08.webp",
+      "pozos-09.webp",
+      "pozos-11.webp",
+      "pozos-12.webp",
+      "pozos-14.webp",
+      "pozos-15.webp",
+      "pozos-16.webp",
+      "pozos-18.webp",
+    ];
+    const afterFicha = afterFichaFiles
+      .map((file) => byFile.get(file))
+      .filter((url): url is string => !!url);
+    const used = new Set(afterFichaFiles);
+    const fichaUrl = urls[0];
+    const rest = entries
+      .filter((e) => !e.file.startsWith("ficha") && !used.has(e.file))
+      .map((e) => e.url);
+    return [fichaUrl, ...afterFicha, ...rest];
+  }
+
   return urls;
 }
 
