@@ -48,18 +48,23 @@ export function getProjectImages(slug: string): string[] {
 
   if (slug === "casa-montoya") {
     const byFile = new Map(entries.map((e) => [e.file, e.url]));
-    const afterFicha = [
+    const afterFichaFiles = [
+      "montoya-4a.webp",
+      "montoya-6a.webp",
       "montoya-ejec-01-planta-baja-n1.webp",
       "montoya-ejec-02-planta-n2-azotea.webp",
       "montoya-ejec-03-cortes-long.webp",
       "montoya-ejec-04-cortes-trans.webp",
       "montoya-ejec-05-fachadas.webp",
-    ]
+    ];
+    const afterFicha = afterFichaFiles
       .map((file) => byFile.get(file))
       .filter((url): url is string => !!url);
-    const used = new Set(afterFicha);
+    const used = new Set(afterFichaFiles);
     const fichaUrl = urls[0];
-    const rest = urls.filter((url) => url !== fichaUrl && !used.has(url));
+    const rest = entries
+      .filter((e) => !e.file.startsWith("ficha") && !used.has(e.file))
+      .map((e) => e.url);
     return [fichaUrl, ...afterFicha, ...rest];
   }
 
