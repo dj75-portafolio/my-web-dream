@@ -36,7 +36,7 @@ export default function CvContactView() {
   const [isPortrait, setIsPortrait] = useState(true);
   const cvImage = getCvImageUrl();
   const cvImageClassName =
-    "h-auto select-none w-full max-w-none block brightness-[0.88] contrast-[0.9]";
+    "h-auto select-none w-full max-w-none block brightness-[0.82] contrast-[0.86]";
 
   useEffect(() => {
     const update = () => setIsPortrait(window.innerHeight >= window.innerWidth);
