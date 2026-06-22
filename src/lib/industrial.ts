@@ -30,7 +30,15 @@ export function getProjectImages(slug: string): string[] {
     return a.file.localeCompare(b.file);
   });
 
-  return entries.map((e) => e.url);
+  const urls = entries.map((e) => e.url);
+
+  if (slug === "cocina-industrial-panama" && urls.length > 3) {
+    const ordered = [...urls];
+    [ordered[1], ordered[3]] = [ordered[3], ordered[1]];
+    return ordered;
+  }
+
+  return urls;
 }
 
 export function getProject(slug: string): Project | undefined {
