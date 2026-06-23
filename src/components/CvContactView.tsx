@@ -83,7 +83,7 @@ export default function CvContactView() {
 
           <div className="flex items-center justify-center gap-10 pt-4 pb-1">
             <a
-              href="https://wa.me/8145942524"
+              href="https://wa.me/578145942524"
               target="_blank"
               rel="noopener noreferrer"
               className="text-portafolio hover:text-portafolio-bright transition-colors"
@@ -115,7 +115,7 @@ export default function CvContactView() {
 
             <div className="flex items-center justify-center gap-10 pt-6 w-full">
               <a
-                href="https://wa.me/8145942524"
+                href="https://wa.me/578145942524"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-portafolio hover:text-portafolio-bright transition-colors"

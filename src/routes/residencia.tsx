@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ProjectGallery from "@/components/ProjectGallery";
-import { residenciaProjects, getProjectImages } from "@/lib/residencia";
+import { residenciaProjects, getFichaUrl, loadProjectImages } from "@/lib/residencia";
 
 export const Route = createFileRoute("/residencia")({
   head: () => ({ meta: [{ title: "Residencial — Portafolio" }] }),
@@ -8,7 +8,8 @@ export const Route = createFileRoute("/residencia")({
     <ProjectGallery
       title="Residencial"
       projects={[...residenciaProjects].reverse()}
-      getProjectImages={getProjectImages}
+      getFichaUrl={getFichaUrl}
+      loadProjectImages={loadProjectImages}
     />
   ),
 });

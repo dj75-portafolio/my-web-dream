@@ -1,5 +1,10 @@
 @import "tailwindcss" source(none);
-@source "../src";
+@source "../src/routes";
+@source "../src/components/ProjectGallery.tsx";
+@source "../src/components/PortadaSignature.tsx";
+@source "../src/components/TypewriterText.tsx";
+@source "../src/components/CvContactView.tsx";
+@source "../src/lib/error-page.ts";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -203,6 +208,10 @@
     height: min(calc(min(88vw, 700px) / 1.858), min(42vh, 420px));
     width: auto;
     max-width: min(88vw, 700px);
+  }
+
+  [data-ficha-scroller] .ficha-item-placeholder {
+    background: rgb(255 255 255 / 0.06);
   }
 
   /* Galería proyecto: más grande que ficha centrada del carrusel (~63vh) */

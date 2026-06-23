@@ -39,12 +39,15 @@ function Index() {
           alt="Portafolio Daniel Jaimes"
           className="block w-full h-auto select-none bg-black"
           draggable={false}
+          fetchPriority="high"
+          decoding="async"
         />
         <PortadaSignature />
         {hotspots.map((h) => (
           <Link
             key={h.to}
             to={h.to}
+            preload="intent"
             aria-label={h.label}
             className="absolute z-10 block rounded-sm transition-colors hover:bg-white/5 focus:bg-white/10 focus:outline-none"
             style={{

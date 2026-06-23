@@ -31,10 +31,13 @@ export default defineConfig({
             enabled: true,
             crawlLinks: true,
             pages: [
+              { path: "/" },
+              { path: "/residencia" },
+              { path: "/comercial" },
+              { path: "/industrial" },
+              { path: "/contacto" },
               { path: "/cv-dj" },
               { path: "/cv" },
-              { path: "/my-web-dream/cv-dj" },
-              { path: "/my-web-dream/cv" },
             ],
           },
         }
