@@ -16,12 +16,17 @@ export const comercialProjects: Project[] = [
   { slug: "villavicencio", name: "VILLAVICENCIO" },
 ];
 
+const fichaModules = import.meta.glob(
+  "/src/assets/comercial/*/ficha*.{webp,jpg,jpeg,png}",
+  { eager: true, query: "?url", import: "default" },
+) as Record<string, string>;
+
 const allModules = import.meta.glob(
   "/src/assets/comercial/*/*.{webp,jpg,jpeg,png}",
   { query: "?url", import: "default" },
 ) as Record<string, () => Promise<string>>;
 
-const loader = createSectionImageLoader("comercial", allModules, (slug, entries) => {
+const loader = createSectionImageLoader("comercial", fichaModules, allModules, (slug, entries) => {
   const urls = entries.map((e) => e.url);
 
   if (slug === "glamping-la-prosperidad") {
@@ -33,7 +38,6 @@ const loader = createSectionImageLoader("comercial", allModules, (slug, entries)
 });
 
 export const getFichaUrl = loader.getFichaUrl;
-export const loadFichaUrl = loader.loadFichaUrl;
 export const loadProjectImages = loader.loadProjectImages;
 export const getProjectImages = loader.getProjectImages;
 

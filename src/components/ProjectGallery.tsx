@@ -28,14 +28,14 @@ function portraitTitleSizeClass(name: string) {
 type Props = {
   title: string;
   projects: Project[];
-  loadFichaUrl: (slug: string) => Promise<string | undefined>;
+  getFichaUrl: (slug: string) => string | undefined;
   loadProjectImages: (slug: string) => Promise<string[]>;
 };
 
 export default function ProjectGallery({
   title,
   projects,
-  loadFichaUrl,
+  getFichaUrl,
   loadProjectImages,
 }: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -45,10 +45,13 @@ export default function ProjectGallery({
   const [projectImages, setProjectImages] = useState<string[]>([]);
   const [projectImagesLoading, setProjectImagesLoading] = useState(false);
   const [visibleProjectCount, setVisibleProjectCount] = useState(PROJECT_IMAGES_INITIAL);
-  const [fichaUrls, setFichaUrls] = useState<Record<string, string>>({});
 
-  const project = selectedIndex !== null ? projects[selectedIndex] : null;
-  const centeredProject = projects[centeredSmall];
+  const projectsWithFicha = projects
+    .map((p) => ({ ...p, ficha: getFichaUrl(p.slug) }))
+    .filter((p): p is Project & { ficha: string } => !!p.ficha);
+
+  const project = selectedIndex !== null ? projectsWithFicha[selectedIndex] : null;
+  const centeredProject = projectsWithFicha[centeredSmall];
   const showClickHint = !project && centeredProject !== undefined;
 
   const bigScrollerRef = useRef<HTMLDivElement>(null);
@@ -61,35 +64,14 @@ export default function ProjectGallery({
 
   useEffect(() => {
     if (project) return;
-    const slugs = [centeredSmall - 1, centeredSmall, centeredSmall + 1]
-      .filter((i) => i >= 0 && i < projects.length)
-      .map((i) => projects[i].slug)
-      .filter((slug, idx, arr) => arr.indexOf(slug) === idx);
-
-    let cancelled = false;
-    for (const slug of slugs) {
-      loadFichaUrl(slug).then((url) => {
-        if (cancelled || !url) return;
-        setFichaUrls((prev) => (prev[slug] ? prev : { ...prev, [slug]: url }));
-      });
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [project, centeredSmall, projects, loadFichaUrl]);
-
-  useEffect(() => {
-    if (project) return;
     [centeredSmall - 1, centeredSmall, centeredSmall + 1]
-      .filter((i) => i >= 0 && i < projects.length)
+      .filter((i) => i >= 0 && i < projectsWithFicha.length)
       .forEach((i) => {
-        const url = fichaUrls[projects[i].slug];
-        if (!url) return;
         const img = new Image();
-        img.src = url;
+        img.src = projectsWithFicha[i].ficha;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, centeredSmall, projects.length, fichaUrls]);
+  }, [project, centeredSmall, projectsWithFicha.length]);
 
   useEffect(() => {
     if (selectedIndex === null) {
@@ -99,7 +81,7 @@ export default function ProjectGallery({
       return;
     }
 
-    const slug = projects[selectedIndex]?.slug;
+    const slug = projectsWithFicha[selectedIndex]?.slug;
     if (!slug) return;
 
     let cancelled = false;
@@ -116,7 +98,7 @@ export default function ProjectGallery({
     return () => {
       cancelled = true;
     };
-  }, [selectedIndex, loadProjectImages, projects]);
+  }, [selectedIndex, loadProjectImages, projectsWithFicha]);
 
   useEffect(() => {
     if (!project || projectImages.length <= visibleProjectCount) return;
@@ -219,7 +201,7 @@ export default function ProjectGallery({
       el.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(snapTimer);
     };
-  }, [project, projects.length]);
+  }, [project, projectsWithFicha.length]);
 
   useEffect(() => {
     if (project) return;
@@ -400,10 +382,9 @@ export default function ProjectGallery({
               width: "max-content",
             }}
           >
-            {projects.map((p, i) => {
+            {projectsWithFicha.map((p, i) => {
               const isCenter = i === centeredSmall;
               const isNear = Math.abs(i - centeredSmall) <= FICHA_RENDER_RADIUS;
-              const ficha = fichaUrls[p.slug];
               return (
                 <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
                   <button
@@ -411,9 +392,9 @@ export default function ProjectGallery({
                     className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
-                    {isNear && ficha ? (
+                    {isNear ? (
                       <img
-                        src={ficha}
+                        src={p.ficha}
                         alt={p.name}
                         loading={isCenter ? "eager" : "lazy"}
                         decoding="async"
