@@ -8,6 +8,10 @@ export type Project = {
   name: string;
 };
 
+const FICHA_RENDER_RADIUS = 1;
+const PROJECT_IMAGES_INITIAL = 2;
+const PROJECT_IMAGES_STEP = 2;
+
 function portraitTitleSizeClass(name: string) {
   if (name.length >= 26) {
     return "text-[13px] tracking-[0.07em] leading-tight whitespace-normal";
@@ -24,26 +28,29 @@ function portraitTitleSizeClass(name: string) {
 type Props = {
   title: string;
   projects: Project[];
-  getProjectImages: (slug: string) => string[];
+  loadFichaUrl: (slug: string) => Promise<string | undefined>;
+  loadProjectImages: (slug: string) => Promise<string[]>;
 };
 
-export default function ProjectGallery({ title, projects, getProjectImages }: Props) {
+export default function ProjectGallery({
+  title,
+  projects,
+  loadFichaUrl,
+  loadProjectImages,
+}: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showHint, setShowHint] = useState(true);
   const [isPortrait, setIsPortrait] = useState(true);
   const [centeredSmall, setCenteredSmall] = useState(0);
+  const [projectImages, setProjectImages] = useState<string[]>([]);
+  const [projectImagesLoading, setProjectImagesLoading] = useState(false);
+  const [visibleProjectCount, setVisibleProjectCount] = useState(PROJECT_IMAGES_INITIAL);
+  const [fichaUrls, setFichaUrls] = useState<Record<string, string>>({});
 
-  const projectsWithFicha = projects
-    .map((p) => {
-      const imgs = getProjectImages(p.slug);
-      return { ...p, ficha: imgs[0], images: imgs };
-    })
-    .filter((p) => !!p.ficha);
+  const project = selectedIndex !== null ? projects[selectedIndex] : null;
+  const centeredProject = projects[centeredSmall];
+  const showClickHint = !project && centeredProject !== undefined;
 
-  const project = selectedIndex !== null ? projectsWithFicha[selectedIndex] : null;
-  const centeredProject = projectsWithFicha[centeredSmall];
-  const showClickHint =
-    !project && centeredProject !== undefined && centeredProject.images.length > 1;
   const bigScrollerRef = useRef<HTMLDivElement>(null);
   const smallScrollerRef = useRef<HTMLDivElement>(null);
   const carouselAreaRef = useRef<HTMLDivElement>(null);
@@ -52,17 +59,74 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     null,
   );
 
-  // Precargar solo la ficha visible y las vecinas (no todas a la vez)
+  useEffect(() => {
+    if (project) return;
+    const slugs = [centeredSmall - 1, centeredSmall, centeredSmall + 1]
+      .filter((i) => i >= 0 && i < projects.length)
+      .map((i) => projects[i].slug)
+      .filter((slug, idx, arr) => arr.indexOf(slug) === idx);
+
+    let cancelled = false;
+    for (const slug of slugs) {
+      loadFichaUrl(slug).then((url) => {
+        if (cancelled || !url) return;
+        setFichaUrls((prev) => (prev[slug] ? prev : { ...prev, [slug]: url }));
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [project, centeredSmall, projects, loadFichaUrl]);
+
   useEffect(() => {
     if (project) return;
     [centeredSmall - 1, centeredSmall, centeredSmall + 1]
-      .filter((i) => i >= 0 && i < projectsWithFicha.length)
+      .filter((i) => i >= 0 && i < projects.length)
       .forEach((i) => {
+        const url = fichaUrls[projects[i].slug];
+        if (!url) return;
         const img = new Image();
-        img.src = projectsWithFicha[i].ficha;
+        img.src = url;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, centeredSmall, projectsWithFicha.length]);
+  }, [project, centeredSmall, projects.length, fichaUrls]);
+
+  useEffect(() => {
+    if (selectedIndex === null) {
+      setProjectImages([]);
+      setProjectImagesLoading(false);
+      setVisibleProjectCount(PROJECT_IMAGES_INITIAL);
+      return;
+    }
+
+    const slug = projects[selectedIndex]?.slug;
+    if (!slug) return;
+
+    let cancelled = false;
+    setProjectImagesLoading(true);
+    setProjectImages([]);
+    setVisibleProjectCount(PROJECT_IMAGES_INITIAL);
+
+    loadProjectImages(slug).then((images) => {
+      if (cancelled) return;
+      setProjectImages(images);
+      setProjectImagesLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedIndex, loadProjectImages, projects]);
+
+  useEffect(() => {
+    if (!project || projectImages.length <= visibleProjectCount) return;
+    const id = window.setTimeout(() => {
+      setVisibleProjectCount((count) =>
+        Math.min(projectImages.length, count + PROJECT_IMAGES_STEP),
+      );
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, [project, projectImages.length, visibleProjectCount]);
 
   const getNearestIndex = (container: HTMLElement) => {
     const center = container.scrollLeft + container.clientWidth / 2;
@@ -155,7 +219,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
       el.removeEventListener("scrollend", onScrollEnd);
       clearTimeout(snapTimer);
     };
-  }, [project, projectsWithFicha.length]);
+  }, [project, projects.length]);
 
   useEffect(() => {
     if (project) return;
@@ -261,6 +325,7 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
     "text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]";
 
   const titleText = project ? project.name : title;
+  const imagesToShow = projectImages.slice(0, visibleProjectCount);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
@@ -335,8 +400,10 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
               width: "max-content",
             }}
           >
-            {projectsWithFicha.map((p, i) => {
+            {projects.map((p, i) => {
               const isCenter = i === centeredSmall;
+              const isNear = Math.abs(i - centeredSmall) <= FICHA_RENDER_RADIUS;
+              const ficha = fichaUrls[p.slug];
               return (
                 <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
                   <button
@@ -344,16 +411,26 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
                     className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
-                    <img
-                      src={p.ficha}
-                      alt={p.name}
-                      loading={isCenter ? "eager" : "lazy"}
-                      decoding="async"
-                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
-                        isCenter ? "is-enlarged" : "is-side"
-                      }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
-                      draggable={false}
-                    />
+                    {isNear && ficha ? (
+                      <img
+                        src={ficha}
+                        alt={p.name}
+                        loading={isCenter ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={isCenter ? "high" : "low"}
+                        className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
+                          isCenter ? "is-enlarged" : "is-side"
+                        }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
+                        draggable={false}
+                      />
+                    ) : (
+                      <div
+                        className={`ficha-item-img ficha-item-placeholder rounded-sm ring-1 ring-white/10 ${
+                          isCenter ? "is-enlarged" : "is-side"
+                        }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
+                        aria-hidden="true"
+                      />
+                    )}
                   </button>
                 </li>
               );
@@ -388,24 +465,31 @@ export default function ProjectGallery({ title, projects, getProjectImages }: Pr
             className="w-full overflow-x-auto no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            <ul className="flex items-center gap-6 py-6 px-[6vw]" style={{ minHeight: "90vh" }}>
-              {project.images.map((src, i) => {
-                const isFicha = i === 0;
-                return (
-                  <li key={src} className="shrink-0">
-                    <img
-                      src={src}
-                      alt={`${project.name} ${isFicha ? "ficha" : i}`}
-                      loading={i < 2 ? "eager" : "lazy"}
-                      decoding="async"
-                      onClick={isFicha ? () => setSelectedIndex(null) : undefined}
-                      className={`project-gallery-img block rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
-                      draggable={false}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
+            {projectImagesLoading && imagesToShow.length === 0 ? (
+              <p className="w-full py-24 text-center text-sm uppercase tracking-[0.25em] text-white/50">
+                Cargando imágenes…
+              </p>
+            ) : (
+              <ul className="flex items-center gap-6 py-6 px-[6vw]" style={{ minHeight: "90vh" }}>
+                {imagesToShow.map((src, i) => {
+                  const isFicha = i === 0;
+                  return (
+                    <li key={src} className="shrink-0">
+                      <img
+                        src={src}
+                        alt={`${project.name} ${isFicha ? "ficha" : i}`}
+                        loading={i < 2 ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={i === 0 ? "high" : "low"}
+                        onClick={isFicha ? () => setSelectedIndex(null) : undefined}
+                        className={`project-gallery-img block rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
+                        draggable={false}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         )}
       </div>

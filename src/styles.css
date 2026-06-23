@@ -1,5 +1,11 @@
 @import "tailwindcss" source(none);
-@source "../src";
+@source "../src/routes";
+@source "../src/components/ProjectGallery.tsx";
+@source "../src/components/PortadaSignature.tsx";
+@source "../src/components/PortadaQr.tsx";
+@source "../src/components/TypewriterText.tsx";
+@source "../src/components/CvContactView.tsx";
+@source "../src/lib/error-page.ts";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -182,20 +188,24 @@
     object-fit: contain;
     object-position: bottom center;
     box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-    transform-origin: bottom center;
     transition:
-      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      max-width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 0.35s ease-out;
   }
 
   [data-ficha-scroller] .ficha-item-img.is-side {
-    transform: scale(1);
     opacity: 0.7;
   }
 
   [data-ficha-scroller] .ficha-item-img.is-enlarged {
-    transform: scale(1.5);
+    height: min(63vh, 630px);
+    max-width: min(92vw, 760px);
     opacity: 1;
+  }
+
+  [data-ficha-scroller] .ficha-item-placeholder {
+    background: rgb(255 255 255 / 0.04);
   }
 
   /* Proyecto Zolino: misma proporción visual que fichas industriales vecinas */

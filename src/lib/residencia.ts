@@ -1,6 +1,4 @@
-// Proyectos de Residencial. Para añadir imágenes, sube los archivos .webp
-// a src/assets/residencia/<slug>/. El archivo que empiece con "ficha"
-// aparecerá siempre primero en el carrusel del proyecto.
+import { createSectionImageLoader } from "@/lib/project-images";
 
 export type Project = {
   slug: string;
@@ -21,29 +19,12 @@ export const residenciaProjects: Project[] = [
   { slug: "apto-santa-barbara", name: "APTO SANTA BARBARA" },
 ];
 
-// Carga ansiosa de todas las imágenes .webp dentro de las carpetas de cada proyecto.
-const imageModules = import.meta.glob(
+const allModules = import.meta.glob(
   "/src/assets/residencia/*/*.{webp,jpg,jpeg,png}",
-  { eager: true, query: "?url", import: "default" },
-) as Record<string, string>;
+  { query: "?url", import: "default" },
+) as Record<string, () => Promise<string>>;
 
-export function getProjectImages(slug: string): string[] {
-  const entries = Object.entries(imageModules)
-    .filter(([path]) => path.includes(`/residencia/${slug}/`))
-    .map(([path, url]) => ({
-      file: path.split("/").pop()!.toLowerCase(),
-      url,
-    }));
-
-  // La ficha (archivo cuyo nombre empieza con "ficha") siempre primero.
-  entries.sort((a, b) => {
-    const aIsFicha = a.file.startsWith("ficha");
-    const bIsFicha = b.file.startsWith("ficha");
-    if (aIsFicha && !bIsFicha) return -1;
-    if (!aIsFicha && bIsFicha) return 1;
-    return a.file.localeCompare(b.file);
-  });
-
+const loader = createSectionImageLoader("residencia", allModules, (slug, entries) => {
   const urls = entries.map((e) => e.url);
 
   if (slug === "casa-montoya") {
@@ -69,7 +50,12 @@ export function getProjectImages(slug: string): string[] {
   }
 
   return urls;
-}
+});
+
+export const getFichaUrl = loader.getFichaUrl;
+export const loadFichaUrl = loader.loadFichaUrl;
+export const loadProjectImages = loader.loadProjectImages;
+export const getProjectImages = loader.getProjectImages;
 
 export function getProject(slug: string): Project | undefined {
   return residenciaProjects.find((p) => p.slug === slug);
