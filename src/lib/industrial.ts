@@ -1,5 +1,3 @@
-import { createSectionImageLoader } from "@/lib/project-images";
-
 export type Project = {
   slug: string;
   name: string;
@@ -11,12 +9,27 @@ export const industrialProjects: Project[] = [
   { slug: "reforma-cocina-alex", name: "REFORMA COCINA ALEX" },
 ];
 
-const allModules = import.meta.glob(
+const imageModules = import.meta.glob(
   "/src/assets/industrial/*/*.{webp,jpg,jpeg,png}",
-  { query: "?url", import: "default" },
-) as Record<string, () => Promise<string>>;
+  { eager: true, query: "?url", import: "default" },
+) as Record<string, string>;
 
-const loader = createSectionImageLoader("industrial", allModules, (slug, entries) => {
+export function getProjectImages(slug: string): string[] {
+  const entries = Object.entries(imageModules)
+    .filter(([path]) => path.includes(`/industrial/${slug}/`))
+    .map(([path, url]) => ({
+      file: path.split("/").pop()!.toLowerCase(),
+      url,
+    }));
+
+  entries.sort((a, b) => {
+    const aIsFicha = a.file.startsWith("ficha");
+    const bIsFicha = b.file.startsWith("ficha");
+    if (aIsFicha && !bIsFicha) return -1;
+    if (!aIsFicha && bIsFicha) return 1;
+    return a.file.localeCompare(b.file);
+  });
+
   const urls = entries.map((e) => e.url);
 
   if (slug === "cocina-industrial-panama" && urls.length > 6) {
@@ -28,12 +41,7 @@ const loader = createSectionImageLoader("industrial", allModules, (slug, entries
   }
 
   return urls;
-});
-
-export const getFichaUrl = loader.getFichaUrl;
-export const loadFichaUrl = loader.loadFichaUrl;
-export const loadProjectImages = loader.loadProjectImages;
-export const getProjectImages = loader.getProjectImages;
+}
 
 export function getProject(slug: string): Project | undefined {
   return industrialProjects.find((p) => p.slug === slug);

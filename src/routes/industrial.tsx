@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ProjectGallery from "@/components/ProjectGallery";
-import { industrialProjects, loadFichaUrl, loadProjectImages } from "@/lib/industrial";
+import { industrialProjects, getProjectImages } from "@/lib/industrial";
 
 export const Route = createFileRoute("/industrial")({
   head: () => ({ meta: [{ title: "Industrial — Portafolio" }] }),
@@ -8,8 +8,7 @@ export const Route = createFileRoute("/industrial")({
     <ProjectGallery
       title="Industrial"
       projects={industrialProjects}
-      loadFichaUrl={loadFichaUrl}
-      loadProjectImages={loadProjectImages}
+      getProjectImages={getProjectImages}
     />
   ),
 });

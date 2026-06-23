@@ -1,6 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { getProject, loadProjectImages } from "@/lib/residencia";
+import { getProject, getProjectImages } from "@/lib/residencia";
 
 export const Route = createFileRoute("/residencia/$project")({
   head: ({ params }) => ({
@@ -19,28 +18,7 @@ function ProjectPage() {
   const data = getProject(project);
   if (!data) throw notFound();
 
-  const [images, setImages] = useState<string[]>([]);
-  const [visibleCount, setVisibleCount] = useState(2);
-
-  useEffect(() => {
-    let cancelled = false;
-    loadProjectImages(project).then((loaded) => {
-      if (!cancelled) setImages(loaded);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [project]);
-
-  useEffect(() => {
-    if (images.length <= visibleCount) return;
-    const id = window.setTimeout(() => {
-      setVisibleCount((count) => Math.min(images.length, count + 2));
-    }, 120);
-    return () => window.clearTimeout(id);
-  }, [images.length, visibleCount]);
-
-  const visibleImages = images.slice(0, visibleCount);
+  const images = getProjectImages(project);
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#000_0%,#1f1f1f_100%)] text-white flex flex-col">
@@ -58,7 +36,13 @@ function ProjectPage() {
       <div className="flex-1 flex items-center">
         {images.length === 0 ? (
           <p className="w-full text-center text-white/50 text-sm uppercase tracking-[0.3em] px-6">
-            Cargando imágenes…
+            Sube las imágenes .webp a
+            <br />
+            <code className="text-white/80 normal-case tracking-normal">
+              src/assets/residencia/{project}/
+            </code>
+            <br />
+            (el archivo que empiece con "ficha" aparecerá primero)
           </p>
         ) : (
           <div
@@ -66,13 +50,11 @@ function ProjectPage() {
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             <ul className="flex items-center gap-6 px-6 py-6">
-              {visibleImages.map((src, i) => (
+              {images.map((src, i) => (
                 <li key={src} className="snap-center shrink-0">
                   <img
                     src={src}
                     alt={`${data.name} ${i === 0 ? "ficha" : i}`}
-                    loading={i < 2 ? "eager" : "lazy"}
-                    decoding="async"
                     className="block max-h-[75vh] w-auto select-none rounded-sm shadow-2xl"
                     draggable={false}
                   />
