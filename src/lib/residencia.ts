@@ -19,17 +19,12 @@ export const residenciaProjects: Project[] = [
   { slug: "apto-santa-barbara", name: "APTO SANTA BARBARA" },
 ];
 
-const fichaModules = import.meta.glob(
-  "/src/assets/residencia/*/ficha*.{webp,jpg,jpeg,png}",
-  { eager: true, query: "?url", import: "default" },
-) as Record<string, string>;
-
 const allModules = import.meta.glob(
   "/src/assets/residencia/*/*.{webp,jpg,jpeg,png}",
   { query: "?url", import: "default" },
 ) as Record<string, () => Promise<string>>;
 
-const loader = createSectionImageLoader("residencia", fichaModules, allModules, (slug, entries) => {
+const loader = createSectionImageLoader("residencia", allModules, (slug, entries) => {
   const urls = entries.map((e) => e.url);
 
   if (slug === "casa-montoya") {
@@ -58,6 +53,7 @@ const loader = createSectionImageLoader("residencia", fichaModules, allModules, 
 });
 
 export const getFichaUrl = loader.getFichaUrl;
+export const loadFichaUrl = loader.loadFichaUrl;
 export const loadProjectImages = loader.loadProjectImages;
 export const getProjectImages = loader.getProjectImages;
 

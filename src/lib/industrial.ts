@@ -11,17 +11,12 @@ export const industrialProjects: Project[] = [
   { slug: "reforma-cocina-alex", name: "REFORMA COCINA ALEX" },
 ];
 
-const fichaModules = import.meta.glob(
-  "/src/assets/industrial/*/ficha*.{webp,jpg,jpeg,png}",
-  { eager: true, query: "?url", import: "default" },
-) as Record<string, string>;
-
 const allModules = import.meta.glob(
   "/src/assets/industrial/*/*.{webp,jpg,jpeg,png}",
   { query: "?url", import: "default" },
 ) as Record<string, () => Promise<string>>;
 
-const loader = createSectionImageLoader("industrial", fichaModules, allModules, (slug, entries) => {
+const loader = createSectionImageLoader("industrial", allModules, (slug, entries) => {
   const urls = entries.map((e) => e.url);
 
   if (slug === "cocina-industrial-panama" && urls.length > 6) {
@@ -36,6 +31,7 @@ const loader = createSectionImageLoader("industrial", fichaModules, allModules, 
 });
 
 export const getFichaUrl = loader.getFichaUrl;
+export const loadFichaUrl = loader.loadFichaUrl;
 export const loadProjectImages = loader.loadProjectImages;
 export const getProjectImages = loader.getProjectImages;
 

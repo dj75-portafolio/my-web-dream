@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { QRCodeSVG } from "qrcode.react";
+import { Suspense, lazy } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import PortadaSignature from "@/components/PortadaSignature";
 import portada from "@/assets/portada.jpg";
+
+const PortadaQr = lazy(() => import("@/components/PortadaQr"));
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,16 +19,18 @@ export const Route = createFileRoute("/")({
 });
 
 const hotspots = [
-  { to: "/residencia" as const, label: "Residencial", top: "7%", left: "18%", width: "58%", height: "4%" },
-  { to: "/comercial" as const, label: "Comercial", top: "28.5%", left: "18%", width: "58%", height: "4%" },
-  { to: "/industrial" as const, label: "Industrial", top: "54.5%", left: "18%", width: "58%", height: "4%" },
-  { to: "/contacto" as const, label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
-];
+  { href: "residencia", label: "Residencial", top: "7%", left: "18%", width: "58%", height: "4%" },
+  { href: "comercial", label: "Comercial", top: "28.5%", left: "18%", width: "58%", height: "4%" },
+  { href: "industrial", label: "Industrial", top: "54.5%", left: "18%", width: "58%", height: "4%" },
+  { href: "contacto", label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
+] as const;
 
 const QR_BOX = { top: "83.8%", left: "34%", width: "31.5%", height: "13.5%" };
 const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
+  const base = import.meta.env.BASE_URL;
+
   return (
     <div data-portada className="min-h-screen w-full bg-black flex items-center justify-center">
       <div
@@ -46,10 +50,9 @@ function Index() {
         <PortadaSignature />
 
         {hotspots.map((h) => (
-          <Link
-            key={h.to}
-            to={h.to}
-            preload="intent"
+          <a
+            key={h.href}
+            href={`${base}${h.href}`}
             aria-label={h.label}
             className="absolute z-10 block rounded-sm transition-colors hover:bg-white/5 focus:bg-white/10 focus:outline-none"
             style={{
@@ -71,7 +74,9 @@ function Index() {
           aria-label="Código QR del portafolio"
         >
           <div className="relative h-full aspect-square bg-black">
-            <QRCodeSVG value={PORTFOLIO_QR_URL} size={128} bgColor="#000000" fgColor="#ffffff" className="h-full w-full" />
+            <Suspense fallback={<div className="h-full w-full bg-white" aria-hidden="true" />}>
+              <PortadaQr url={PORTFOLIO_QR_URL} />
+            </Suspense>
           </div>
         </div>
       </div>

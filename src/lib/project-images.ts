@@ -25,22 +25,31 @@ function isFichaPath(path: string): boolean {
 
 export function createSectionImageLoader(
   section: string,
-  fichaModules: Record<string, string>,
   allModules: Record<string, () => Promise<string>>,
   orderUrls?: OrderFn,
 ) {
-  const fichaBySlug = new Map<string, string>();
-  for (const [path, url] of Object.entries(fichaModules)) {
-    const slug = slugFromSectionPath(section, path);
-    if (slug && isFichaPath(path)) {
-      fichaBySlug.set(slug, url);
-    }
+  const cache = new Map<string, string[]>();
+  const fichaCache = new Map<string, string>();
+
+  async function loadFichaUrl(slug: string): Promise<string | undefined> {
+    const fromFull = cache.get(slug)?.[0];
+    if (fromFull) return fromFull;
+
+    const hit = fichaCache.get(slug);
+    if (hit) return hit;
+
+    const fichaLoader = Object.entries(allModules).find(
+      ([path]) => path.includes(`/assets/${section}/${slug}/`) && isFichaPath(path),
+    );
+    if (!fichaLoader) return undefined;
+
+    const url = await fichaLoader[1]();
+    fichaCache.set(slug, url);
+    return url;
   }
 
-  const cache = new Map<string, string[]>();
-
   function getFichaUrl(slug: string): string | undefined {
-    return cache.get(slug)?.[0] ?? fichaBySlug.get(slug);
+    return cache.get(slug)?.[0] ?? fichaCache.get(slug);
   }
 
   async function loadProjectImages(slug: string): Promise<string[]> {
@@ -61,6 +70,7 @@ export function createSectionImageLoader(
     const sorted = sortEntries(entries);
     const urls = orderUrls ? orderUrls(slug, sorted) : sorted.map((e) => e.url);
     cache.set(slug, urls);
+    if (urls[0]) fichaCache.set(slug, urls[0]);
     return urls;
   }
 
@@ -68,5 +78,5 @@ export function createSectionImageLoader(
     return cache.get(slug) ?? [];
   }
 
-  return { getFichaUrl, loadProjectImages, getProjectImages };
+  return { getFichaUrl, loadFichaUrl, loadProjectImages, getProjectImages };
 }

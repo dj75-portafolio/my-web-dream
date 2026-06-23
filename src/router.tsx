@@ -5,7 +5,7 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     scrollRestoration: true,
-    defaultPreload: "intent",
+    defaultPreload: false,
     defaultPreloadStaleTime: 0,
   });
 
