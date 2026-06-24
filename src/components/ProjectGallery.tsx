@@ -8,10 +8,6 @@ export type Project = {
   name: string;
 };
 
-const FICHA_RENDER_RADIUS = 1;
-const PROJECT_IMAGES_INITIAL = 2;
-const PROJECT_IMAGES_STEP = 2;
-
 function portraitTitleSizeClass(name: string) {
   if (name.length >= 26) {
     return "text-[13px] tracking-[0.07em] leading-tight whitespace-normal";
@@ -44,7 +40,6 @@ export default function ProjectGallery({
   const [centeredSmall, setCenteredSmall] = useState(0);
   const [projectImages, setProjectImages] = useState<string[]>([]);
   const [projectImagesLoading, setProjectImagesLoading] = useState(false);
-  const [visibleProjectCount, setVisibleProjectCount] = useState(PROJECT_IMAGES_INITIAL);
   const [centerHasGallery, setCenterHasGallery] = useState(false);
 
   const projectsWithFicha = projects
@@ -63,7 +58,6 @@ export default function ProjectGallery({
     null,
   );
 
-  // Precargar solo la ficha visible y las vecinas (no todas a la vez)
   useEffect(() => {
     if (project) return;
     [centeredSmall - 1, centeredSmall, centeredSmall + 1]
@@ -95,7 +89,6 @@ export default function ProjectGallery({
     if (selectedIndex === null) {
       setProjectImages([]);
       setProjectImagesLoading(false);
-      setVisibleProjectCount(PROJECT_IMAGES_INITIAL);
       return;
     }
 
@@ -105,7 +98,6 @@ export default function ProjectGallery({
     let cancelled = false;
     setProjectImagesLoading(true);
     setProjectImages([]);
-    setVisibleProjectCount(PROJECT_IMAGES_INITIAL);
 
     loadProjectImages(slug).then((images) => {
       if (cancelled) return;
@@ -117,16 +109,6 @@ export default function ProjectGallery({
       cancelled = true;
     };
   }, [selectedIndex, loadProjectImages, projectsWithFicha]);
-
-  useEffect(() => {
-    if (!project || projectImages.length <= visibleProjectCount) return;
-    const id = window.setTimeout(() => {
-      setVisibleProjectCount((count) =>
-        Math.min(projectImages.length, count + PROJECT_IMAGES_STEP),
-      );
-    }, 120);
-    return () => window.clearTimeout(id);
-  }, [project, projectImages.length, visibleProjectCount]);
 
   const getNearestIndex = (container: HTMLElement) => {
     const center = container.scrollLeft + container.clientWidth / 2;
@@ -325,7 +307,6 @@ export default function ProjectGallery({
     "text-portafolio hover:text-portafolio-bright text-2xl leading-none transition drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]";
 
   const titleText = project ? project.name : title;
-  const imagesToShow = projectImages.slice(0, visibleProjectCount);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col relative">
@@ -402,7 +383,6 @@ export default function ProjectGallery({
           >
             {projectsWithFicha.map((p, i) => {
               const isCenter = i === centeredSmall;
-              const isNear = Math.abs(i - centeredSmall) <= FICHA_RENDER_RADIUS;
               return (
                 <li key={p.slug} data-snap-item className="ficha-item snap-center shrink-0">
                   <button
@@ -410,26 +390,16 @@ export default function ProjectGallery({
                     className="ficha-item-btn block group"
                     aria-label={p.name}
                   >
-                    {isNear ? (
-                      <img
-                        src={p.ficha}
-                        alt={p.name}
-                        loading={isCenter ? "eager" : "lazy"}
-                        decoding="async"
-                        fetchPriority={isCenter ? "high" : "low"}
-                        className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
-                          isCenter ? "is-enlarged" : "is-side"
-                        }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
-                        draggable={false}
-                      />
-                    ) : (
-                      <div
-                        className={`ficha-item-img ficha-item-placeholder rounded-sm ring-1 ring-white/10 ${
-                          isCenter ? "is-enlarged" : "is-side"
-                        }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
-                        aria-hidden="true"
-                      />
-                    )}
+                    <img
+                      src={p.ficha}
+                      alt={p.name}
+                      loading={isCenter ? "eager" : "lazy"}
+                      decoding="async"
+                      className={`ficha-item-img rounded-sm ring-1 ring-white/10 origin-bottom ${
+                        isCenter ? "is-enlarged" : "is-side"
+                      }${p.slug === "proyecto-zolino" ? " ficha-item-img--zolino" : ""}`}
+                      draggable={false}
+                    />
                   </button>
                 </li>
               );
@@ -464,13 +434,13 @@ export default function ProjectGallery({
             className="w-full overflow-x-auto no-scrollbar"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
-            {projectImagesLoading && imagesToShow.length === 0 ? (
+            {projectImagesLoading && projectImages.length === 0 ? (
               <p className="w-full py-24 text-center text-sm uppercase tracking-[0.25em] text-white/50">
                 Cargando imágenes…
               </p>
             ) : (
               <ul className="flex items-center gap-6 py-6 px-[6vw]" style={{ minHeight: "90vh" }}>
-                {imagesToShow.map((src, i) => {
+                {projectImages.map((src, i) => {
                   const isFicha = i === 0;
                   return (
                     <li key={src} className="shrink-0">
@@ -479,7 +449,6 @@ export default function ProjectGallery({
                         alt={`${project.name} ${isFicha ? "ficha" : i}`}
                         loading={i < 2 ? "eager" : "lazy"}
                         decoding="async"
-                        fetchPriority={i === 0 ? "high" : "low"}
                         onClick={isFicha ? () => setSelectedIndex(null) : undefined}
                         className={`project-gallery-img block rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
                         draggable={false}
