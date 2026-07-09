@@ -60,24 +60,31 @@ function Index() {
         ))}
         {/* QR cuadrado: sin franjas blancas laterales */}
         <div
-          className="absolute z-20 flex items-center justify-center overflow-hidden"
+          className="absolute z-20 flex flex-col items-center"
           style={{
             top: QR_BOX.top,
             left: QR_BOX.left,
             width: QR_BOX.width,
-            height: QR_BOX.height,
           }}
-          aria-label="Código QR del portafolio"
         >
-          <div className="relative h-full aspect-square bg-black">
-            <QRCodeSVG
-              value={PORTFOLIO_QR_URL}
-              level="M"
-              bgColor="#ffffff"
-              fgColor="#000000"
-              className="h-full w-full"
-            />
+          <div
+            className="flex w-full items-center justify-center overflow-hidden"
+            style={{ height: QR_BOX.height }}
+            aria-label="Código QR del portafolio"
+          >
+            <div className="relative h-full aspect-square bg-black">
+              <QRCodeSVG
+                value={PORTFOLIO_QR_URL}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#000000"
+                className="h-full w-full"
+              />
+            </div>
           </div>
+          <p className="mt-[1.4cqw] text-[2.1cqw] leading-none tracking-[0.06em] text-white/50 text-center">
+            developed by Daniel Jaimes
+          </p>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 /** Sube este número al reemplazar public/contacto/cv.webp (fuerza vista nueva en celular/WhatsApp). */
-export const CV_VERSION = "2026-06-22-eyes-less-green-v2";
+export const CV_VERSION = "2026-07-09-natural-eyes-v3";
 
 const SITE_ORIGIN = "https://dj75-portafolio.github.io/my-web-dream";
 
