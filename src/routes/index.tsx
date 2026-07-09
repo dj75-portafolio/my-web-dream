@@ -16,15 +16,28 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/** Mismo desplazamiento hacia arriba para menú y bloque QR (mantiene proporciones). */
+const PORTADA_SHIFT_UP_PCT = 6.5;
+
+function shiftTopPercent(top: string): string {
+  const value = Number.parseFloat(top);
+  return `${Math.max(0.3, value - PORTADA_SHIFT_UP_PCT).toFixed(1)}%`;
+}
+
 const hotspots = [
   { to: "/residencia" as const, label: "Residencial", top: "7%", left: "18%", width: "58%", height: "4%" },
   { to: "/comercial" as const, label: "Comercial", top: "28.5%", left: "18%", width: "58%", height: "4%" },
   { to: "/industrial" as const, label: "Industrial", top: "54.5%", left: "18%", width: "58%", height: "4%" },
   { to: "/contacto" as const, label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
-];
+].map((h) => ({ ...h, top: shiftTopPercent(h.top) }));
 
 // Posición del QR impreso en la portada (coordenadas relativas a la imagen)
-const QR_BOX = { top: "83.8%", left: "34%", width: "31.5%", height: "13.5%" };
+const QR_BOX = {
+  top: shiftTopPercent("83.8%"),
+  left: "34%",
+  width: "31.5%",
+  height: "12.8%",
+};
 const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
@@ -82,7 +95,7 @@ function Index() {
               />
             </div>
           </div>
-          <p className="mt-[1.4cqw] text-[2.1cqw] leading-none tracking-[0.06em] text-white/50 text-center">
+          <p className="mt-[0.9cqw] text-[1.9cqw] leading-none tracking-[0.06em] text-white/50 text-center">
             developed by Daniel Jaimes
           </p>
         </div>
