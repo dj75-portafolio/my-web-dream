@@ -443,11 +443,11 @@ export default function ProjectGallery({
                 {projectImages.map((src, i) => {
                   const isFicha = i === 0;
                   return (
-                    <li key={src} className="shrink-0">
+                    <li key={`${src}-${i}`} className="shrink-0">
                       <img
                         src={src}
                         alt={`${project.name} ${isFicha ? "ficha" : i}`}
-                        loading={i < 2 ? "eager" : "lazy"}
+                        loading="eager"
                         decoding="async"
                         onClick={isFicha ? () => setSelectedIndex(null) : undefined}
                         className={`project-gallery-img block rounded-sm shadow-2xl ring-1 ring-white/15 ${isFicha ? "cursor-pointer" : ""}`}
