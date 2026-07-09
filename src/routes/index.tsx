@@ -16,28 +16,16 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-/** Mismo desplazamiento hacia arriba para menú y bloque QR (mantiene proporciones). */
-const PORTADA_SHIFT_UP_PCT = 6.5;
-
-function shiftTopPercent(top: string): string {
-  const value = Number.parseFloat(top);
-  return `${Math.max(0.3, value - PORTADA_SHIFT_UP_PCT).toFixed(1)}%`;
-}
-
 const hotspots = [
   { to: "/residencia" as const, label: "Residencial", top: "7%", left: "18%", width: "58%", height: "4%" },
   { to: "/comercial" as const, label: "Comercial", top: "28.5%", left: "18%", width: "58%", height: "4%" },
   { to: "/industrial" as const, label: "Industrial", top: "54.5%", left: "18%", width: "58%", height: "4%" },
   { to: "/contacto" as const, label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
-].map((h) => ({ ...h, top: shiftTopPercent(h.top) }));
+];
 
-// Posición del QR impreso en la portada (coordenadas relativas a la imagen)
-const QR_BOX = {
-  top: shiftTopPercent("83.8%"),
-  left: "34%",
-  width: "31.5%",
-  height: "12.8%",
-};
+// QR alineado a la portada; crédito aparte para no empujar el bloque hacia abajo.
+const QR_BOX = { top: "83.8%", left: "34%", width: "31.5%", height: "11.2%" };
+const CREDIT_BOX = { top: "95.1%", left: "34%", width: "31.5%" };
 const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
@@ -71,36 +59,37 @@ function Index() {
             }}
           />
         ))}
-        {/* QR cuadrado: sin franjas blancas laterales */}
         <div
-          className="absolute z-20 flex flex-col items-center"
+          className="absolute z-20 flex items-center justify-center overflow-hidden"
           style={{
             top: QR_BOX.top,
             left: QR_BOX.left,
             width: QR_BOX.width,
+            height: QR_BOX.height,
+          }}
+          aria-label="Código QR del portafolio"
+        >
+          <div className="relative h-full aspect-square bg-black">
+            <QRCodeSVG
+              value={PORTFOLIO_QR_URL}
+              level="M"
+              bgColor="#ffffff"
+              fgColor="#000000"
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+        <p
+          className="absolute z-20 text-[1.85cqw] leading-none tracking-[0.05em] text-[#8a8a8a] text-center pointer-events-none"
+          style={{
+            top: CREDIT_BOX.top,
+            left: CREDIT_BOX.left,
+            width: CREDIT_BOX.width,
           }}
         >
-          <div
-            className="flex w-full items-center justify-center overflow-hidden"
-            style={{ height: QR_BOX.height }}
-            aria-label="Código QR del portafolio"
-          >
-            <div className="relative h-full aspect-square bg-black">
-              <QRCodeSVG
-                value={PORTFOLIO_QR_URL}
-                level="M"
-                bgColor="#ffffff"
-                fgColor="#000000"
-                className="h-full w-full"
-              />
-            </div>
-          </div>
-          <p className="mt-[0.9cqw] text-[1.9cqw] leading-none tracking-[0.06em] text-white/50 text-center">
-            developed by Daniel Jaimes
-          </p>
-        </div>
+          developed by Daniel Jaimes
+        </p>
       </div>
     </div>
   );
 }
-
