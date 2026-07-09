@@ -23,9 +23,10 @@ const hotspots = [
   { to: "/contacto" as const, label: "Contacto", top: "76.5%", left: "18%", width: "58%", height: "3.5%" },
 ];
 
-// QR alineado a la portada; crédito aparte para no empujar el bloque hacia abajo.
-const QR_BOX = { top: "83.8%", left: "34%", width: "31.5%", height: "11.2%" };
-const CREDIT_BOX = { top: "95.1%", left: "34%", width: "31.5%" };
+// Parche negro sobre el QR gris impreso en portada.jpg (solo queda el QR blanco activo).
+const QR_PATCH = { top: "82.4%", left: "30%", width: "40%", height: "15.8%" };
+const QR_BOX = { top: "85.2%", left: "34%", width: "31.5%", height: "10.4%" };
+const CREDIT_BOX = { top: "96.7%", left: "34%", width: "31.5%" };
 const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
@@ -59,6 +60,16 @@ function Index() {
             }}
           />
         ))}
+        <div
+          className="absolute z-[15] bg-black pointer-events-none"
+          style={{
+            top: QR_PATCH.top,
+            left: QR_PATCH.left,
+            width: QR_PATCH.width,
+            height: QR_PATCH.height,
+          }}
+          aria-hidden="true"
+        />
         <div
           className="absolute z-20 flex items-center justify-center overflow-hidden"
           style={{
