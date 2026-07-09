@@ -26,7 +26,7 @@ const hotspots = [
 // Parche negro sobre el QR gris impreso en portada.jpg (solo queda el QR blanco activo).
 const QR_PATCH = { top: "82.4%", left: "30%", width: "40%", height: "15.8%" };
 const QR_BOX = { top: "85.2%", left: "34%", width: "31.5%", height: "10.4%" };
-const CREDIT_BOX = { top: "96.7%", left: "34%", width: "31.5%" };
+const CREDIT_BOX = { top: "97.4%", left: "34%", width: "31.5%" };
 const PORTFOLIO_QR_URL = "https://dj75-portafolio.github.io/my-web-dream/";
 
 function Index() {
