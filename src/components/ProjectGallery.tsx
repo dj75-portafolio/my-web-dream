@@ -442,11 +442,17 @@ export default function ProjectGallery({
               <ul className="flex items-center gap-6 py-6 px-[6vw]" style={{ minHeight: "90vh" }}>
                 {projectImages.map((src, i) => {
                   const isFicha = i === 0;
+                  const label =
+                    src
+                      .split("/")
+                      .pop()
+                      ?.replace(/\.[^.]+$/, "")
+                      .replace(/-/g, " ") ?? String(i);
                   return (
                     <li key={`${src}-${i}`} className="shrink-0">
                       <img
                         src={src}
-                        alt={`${project.name} ${isFicha ? "ficha" : i}`}
+                        alt={isFicha ? `${project.name} ficha` : `${project.name} ${label}`}
                         loading="eager"
                         decoding="async"
                         onClick={isFicha ? () => setSelectedIndex(null) : undefined}
