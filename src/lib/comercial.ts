@@ -34,11 +34,6 @@ const loader = createSectionImageLoader("comercial", fichaModules, allModules, (
     return [urls[0], ...urls.slice(4, 8), ...urls.slice(1, 4), ...urls.slice(8)];
   }
 
-  if (slug === "dli-paleteria-sede-campestre") {
-    if (urls.length <= 2) return urls;
-    return [urls[0], urls[urls.length - 1], ...urls.slice(1, -1)];
-  }
-
   return urls;
 });
 
