@@ -8,6 +8,11 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+scripts/node_modules
+package-lock.json
+.vercel/
+_cv-before.webp
+_live-pozos.html
 dist
 dist-ssr
 .output

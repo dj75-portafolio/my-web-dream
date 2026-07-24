@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Herramientas locales (CV, imagenes). No afectan GitHub Pages.",
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.2"
+  }
+}
